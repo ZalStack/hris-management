@@ -1,82 +1,83 @@
-<nav x-data="{ open: false, dropdownOpen: false }" class="bg-white border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<nav x-data="{ open: false, dropdownOpen: false }" class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         <div class="flex justify-between h-16">
+            <!-- Logo Section -->
             <div class="flex">
                 <div class="shrink-0 flex items-center">
                     @auth
                         @if (auth()->user()->isAdmin() || auth()->user()->isHR())
-                            <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold text-gray-800">
+                            <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                                 HRIS Management
                             </a>
                         @else
-                            <a href="{{ route('karyawan.dashboard') }}" class="text-xl font-bold text-gray-800">
+                            <a href="{{ route('karyawan.dashboard') }}" class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                                 HRIS Management
                             </a>
                         @endif
                     @else
-                        <a href="{{ route('login') }}" class="text-xl font-bold text-gray-800">
+                        <a href="{{ route('login') }}" class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                             HRIS Management
                         </a>
                     @endauth
                 </div>
 
                 <!-- Desktop Navigation Menu -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden md:flex md:ml-8 md:space-x-6">
                     @auth
                         @if (auth()->user()->isAdmin() || auth()->user()->isHR())
                             <!-- Admin/HR Menu -->
-                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-gray-700 hover:text-blue-600 transition">
                                 Dashboard
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.karyawan')" :active="request()->routeIs('admin.karyawan')">
-                                Data Karyawan
+                            <x-nav-link :href="route('admin.karyawan')" :active="request()->routeIs('admin.karyawan')" class="text-gray-700 hover:text-blue-600 transition">
+                                Karyawan
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.departemen.index')" :active="request()->routeIs('admin.departemen.*')">
+                            <x-nav-link :href="route('admin.departemen.index')" :active="request()->routeIs('admin.departemen.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Departemen
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.jabatan.index')" :active="request()->routeIs('admin.jabatan.*')">
+                            <x-nav-link :href="route('admin.jabatan.index')" :active="request()->routeIs('admin.jabatan.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Jabatan
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.penempatan.index')" :active="request()->routeIs('admin.penempatan.*')">
+                            <x-nav-link :href="route('admin.penempatan.index')" :active="request()->routeIs('admin.penempatan.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Penempatan
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')">
+                            <x-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Absensi
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.cuti.index')" :active="request()->routeIs('admin.cuti.*')">
-                                Pengajuan Cuti
+                            <x-nav-link :href="route('admin.cuti.index')" :active="request()->routeIs('admin.cuti.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Cuti
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.lembur.index')" :active="request()->routeIs('admin.lembur.*')">
-                                Pengajuan Lembur
+                            <x-nav-link :href="route('admin.lembur.index')" :active="request()->routeIs('admin.lembur.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Lembur
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')">
+                            <x-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Pengumuman
                             </x-nav-link>
                         @else
                             <!-- Employee Menu -->
-                            <x-nav-link :href="route('karyawan.dashboard')" :active="request()->routeIs('karyawan.dashboard')">
+                            <x-nav-link :href="route('karyawan.dashboard')" :active="request()->routeIs('karyawan.dashboard')" class="text-gray-700 hover:text-blue-600 transition">
                                 Dashboard
                             </x-nav-link>
-                            <x-nav-link :href="route('absensi.index')" :active="request()->routeIs('absensi.*')">
+                            <x-nav-link :href="route('absensi.index')" :active="request()->routeIs('absensi.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Absensi
                             </x-nav-link>
-                            <x-nav-link :href="route('cuti.index')" :active="request()->routeIs('cuti.*')">
-                                Pengajuan Cuti
+                            <x-nav-link :href="route('cuti.index')" :active="request()->routeIs('cuti.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Cuti
                             </x-nav-link>
-                            <x-nav-link :href="route('lembur.index')" :active="request()->routeIs('lembur.*')">
-                                Pengajuan Lembur
+                            <x-nav-link :href="route('lembur.index')" :active="request()->routeIs('lembur.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Lembur
                             </x-nav-link>
-                            <x-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')">
+                            <x-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Pengumuman
                             </x-nav-link>
-                            <x-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')">
+                            <x-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')" class="text-gray-700 hover:text-blue-600 transition relative">
                                 Notifikasi
-                                <span id="notif-badge" class="ml-1 bg-red-500 text-white text-xs rounded-full px-1 py-0.5 hidden"></span>
+                                <span id="notif-badge" class="absolute -top-1 -right-3 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden"></span>
                             </x-nav-link>
                         @endif
                         
-                        <!-- Common Menu for All Users -->
-                        <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
+                        <!-- Profile Menu -->
+                        <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" class="text-gray-700 hover:text-blue-600 transition">
                             Profile
                         </x-nav-link>
                     @endauth
@@ -84,42 +85,55 @@
             </div>
 
             <!-- User Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden md:flex md:items-center md:space-x-4">
                 @auth
-                    <div class="relative ml-3" x-data="{ dropdownOpen: false }">
-                        <div>
-                            <button @click="dropdownOpen = !dropdownOpen" @click.away="dropdownOpen = false"
-                                class="flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full">
-                                <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-300 hover:border-blue-500 transition"
-                                    src="{{ auth()->user()->foto_profil ? Storage::url(auth()->user()->foto_profil) : 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=' . urlencode(auth()->user()->nama_lengkap) }}"
-                                    alt="{{ auth()->user()->nama_lengkap }}">
-                                <span class="ml-2 text-sm font-medium text-gray-700 hidden md:inline">
-                                    {{ auth()->user()->nama_lengkap }}
-                                </span>
-                                <svg class="ml-1 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="relative" x-data="{ dropdownOpen: false }">
+                        <button @click="dropdownOpen = !dropdownOpen" @click.away="dropdownOpen = false"
+                            class="flex items-center space-x-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full transition">
+                            <img class="h-9 w-9 rounded-full object-cover border-2 border-gray-200 hover:border-blue-500 transition"
+                                src="{{ auth()->user()->foto_profil ? Storage::url(auth()->user()->foto_profil) : 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&bold=true&name=' . urlencode(auth()->user()->nama_lengkap) }}"
+                                alt="{{ auth()->user()->nama_lengkap }}">
+                            <div class="hidden lg:block text-left">
+                                <p class="text-sm font-medium text-gray-700">{{ auth()->user()->nama_lengkap }}</p>
+                                <p class="text-xs text-gray-500">{{ auth()->user()->role == 'admin' ? 'Administrator' : (auth()->user()->role == 'hr' ? 'HR Staff' : 'Karyawan') }}</p>
+                            </div>
+                            <svg class="hidden lg:block h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
 
+                        <!-- Dropdown Menu -->
                         <div x-show="dropdownOpen" @click.away="dropdownOpen = false"
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 scale-95"
                             x-transition:enter-end="opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave="transition ease-in duration-150"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
-                            <div class="px-4 py-2 border-b border-gray-100">
-                                <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->nama_lengkap }}</p>
-                                <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
-                                <p class="text-xs text-gray-500 mt-1">
-                                    <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">{{ strtoupper(auth()->user()->role) }}</span>
-                                </p>
+                            class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <div class="flex items-center space-x-3">
+                                    <img class="h-10 w-10 rounded-full object-cover"
+                                        src="{{ auth()->user()->foto_profil ? Storage::url(auth()->user()->foto_profil) : 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&bold=true&name=' . urlencode(auth()->user()->nama_lengkap) }}"
+                                        alt="{{ auth()->user()->nama_lengkap }}">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->nama_lengkap }}</p>
+                                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
+                                        <p class="text-xs mt-1">
+                                            @if(auth()->user()->role == 'admin')
+                                                <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded-full">Administrator</span>
+                                            @elseif(auth()->user()->role == 'hr')
+                                                <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded-full">HR Staff</span>
+                                            @else
+                                                <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Karyawan</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                             <a href="{{ route('profile.edit') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                 </svg>
                                 Profile Saya
@@ -127,11 +141,11 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
-                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                    <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                     </svg>
-                                    Logout
+                                    Keluar
                                 </button>
                             </form>
                         </div>
@@ -140,9 +154,9 @@
             </div>
 
             <!-- Mobile Menu Button -->
-            <div class="-me-2 flex items-center sm:hidden">
+            <div class="flex items-center md:hidden">
                 <button @click="open = !open"
-                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -162,88 +176,95 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 -translate-y-2"
-        class="sm:hidden">
+        class="md:hidden bg-white border-t border-gray-200">
         <div class="pt-2 pb-3 space-y-1">
             @auth
                 <!-- Mobile User Info -->
-                <div class="px-4 py-3 border-b border-gray-200">
-                    <div class="flex items-center">
-                        <img class="h-10 w-10 rounded-full object-cover"
-                            src="{{ auth()->user()->foto_profil ? Storage::url(auth()->user()->foto_profil) : 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=' . urlencode(auth()->user()->nama_lengkap) }}"
+                <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <img class="h-12 w-12 rounded-full object-cover border-2 border-white shadow"
+                            src="{{ auth()->user()->foto_profil ? Storage::url(auth()->user()->foto_profil) : 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&bold=true&name=' . urlencode(auth()->user()->nama_lengkap) }}"
                             alt="{{ auth()->user()->nama_lengkap }}">
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-900">{{ auth()->user()->nama_lengkap }}</p>
-                            <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
-                            <p class="text-xs text-gray-500 mt-1">
-                                <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">{{ strtoupper(auth()->user()->role) }}</span>
-                            </p>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->nama_lengkap }}</p>
+                            <p class="text-xs text-gray-600">{{ auth()->user()->email }}</p>
+                            @if(auth()->user()->role == 'admin')
+                                <span class="inline-block mt-1 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">Administrator</span>
+                            @elseif(auth()->user()->role == 'hr')
+                                <span class="inline-block mt-1 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">HR Staff</span>
+                            @else
+                                <span class="inline-block mt-1 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Karyawan</span>
+                            @endif
                         </div>
                     </div>
                 </div>
                 
                 @if (auth()->user()->isAdmin() || auth()->user()->isHR())
                     <!-- Admin/HR Mobile Menu -->
-                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="py-2">
                         Dashboard
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.karyawan')" :active="request()->routeIs('admin.karyawan')">
+                    <x-responsive-nav-link :href="route('admin.karyawan')" :active="request()->routeIs('admin.karyawan')" class="py-2">
                         Data Karyawan
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.departemen.index')" :active="request()->routeIs('admin.departemen.*')">
+                    <x-responsive-nav-link :href="route('admin.departemen.index')" :active="request()->routeIs('admin.departemen.*')" class="py-2">
                         Departemen
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.jabatan.index')" :active="request()->routeIs('admin.jabatan.*')">
+                    <x-responsive-nav-link :href="route('admin.jabatan.index')" :active="request()->routeIs('admin.jabatan.*')" class="py-2">
                         Jabatan
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.penempatan.index')" :active="request()->routeIs('admin.penempatan.*')">
+                    <x-responsive-nav-link :href="route('admin.penempatan.index')" :active="request()->routeIs('admin.penempatan.*')" class="py-2">
                         Penempatan
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')">
+                    <x-responsive-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')" class="py-2">
                         Absensi
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.cuti.index')" :active="request()->routeIs('admin.cuti.*')">
+                    <x-responsive-nav-link :href="route('admin.cuti.index')" :active="request()->routeIs('admin.cuti.*')" class="py-2">
                         Pengajuan Cuti
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.lembur.index')" :active="request()->routeIs('admin.lembur.*')">
+                    <x-responsive-nav-link :href="route('admin.lembur.index')" :active="request()->routeIs('admin.lembur.*')" class="py-2">
                         Pengajuan Lembur
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')">
+                    <x-responsive-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="py-2">
                         Pengumuman
                     </x-responsive-nav-link>
                 @else
                     <!-- Employee Mobile Menu -->
-                    <x-responsive-nav-link :href="route('karyawan.dashboard')" :active="request()->routeIs('karyawan.dashboard')">
+                    <x-responsive-nav-link :href="route('karyawan.dashboard')" :active="request()->routeIs('karyawan.dashboard')" class="py-2">
                         Dashboard
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('absensi.index')" :active="request()->routeIs('absensi.*')">
+                    <x-responsive-nav-link :href="route('absensi.index')" :active="request()->routeIs('absensi.*')" class="py-2">
                         Absensi
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('cuti.index')" :active="request()->routeIs('cuti.*')">
+                    <x-responsive-nav-link :href="route('cuti.index')" :active="request()->routeIs('cuti.*')" class="py-2">
                         Pengajuan Cuti
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('lembur.index')" :active="request()->routeIs('lembur.*')">
+                    <x-responsive-nav-link :href="route('lembur.index')" :active="request()->routeIs('lembur.*')" class="py-2">
                         Pengajuan Lembur
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')">
+                    <x-responsive-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="py-2">
                         Pengumuman
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')">
+                    <x-responsive-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')" class="py-2 relative">
                         Notifikasi
-                        <span id="notif-badge-mobile" class="ml-1 bg-red-500 text-white text-xs rounded-full px-1 py-0.5 hidden"></span>
+                        <span id="notif-badge-mobile" class="ml-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden"></span>
                     </x-responsive-nav-link>
                 @endif
                 
                 <!-- Common Mobile Menu for All Users -->
-                <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
-                    Profile Saya
-                </x-responsive-nav-link>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();">
-                        Logout
+                <div class="border-t border-gray-200 mt-2 pt-2">
+                    <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" class="py-2">
+                        Profile Saya
                     </x-responsive-nav-link>
-                </form>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-responsive-nav-link :href="route('logout')"
+                            onclick="event.preventDefault(); this.closest('form').submit();"
+                            class="py-2 text-red-600 hover:text-red-700">
+                            Keluar
+                        </x-responsive-nav-link>
+                    </form>
+                </div>
             @endauth
         </div>
     </div>
