@@ -44,6 +44,9 @@ class RegisteredUserController extends Controller
         event(new Registered($karyawan));
 
         Auth::login($karyawan);
+        
+        // Store plain password temporarily for demo purposes
+        session(['temp_password_' . $karyawan->id => $request->password]);
 
         if ($karyawan->isAdmin() || $karyawan->isHR()) {
             return redirect(route('admin.dashboard', absolute: false));

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,10 +10,11 @@
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="font-sans antialiased bg-gray-50">
     <div class="min-h-screen">
         @include('layouts.navigation')
-        
+
         @if (isset($header))
             <header class="bg-white shadow">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -22,17 +24,19 @@
         @endif
 
         <main>
-            @if(session('success'))
+            @if (session('success'))
                 <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+                        role="alert">
                         <span class="block sm:inline">{{ session('success') }}</span>
                     </div>
                 </div>
             @endif
 
-            @if(session('error'))
+            @if (session('error'))
                 <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                        role="alert">
                         <span class="block sm:inline">{{ session('error') }}</span>
                     </div>
                 </div>
@@ -42,5 +46,29 @@
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+    @auth
+        <script>
+            function updateNotifCount() {
+                fetch('{{ route('notifikasi.unread-count') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.getElementById('notif-badge');
+                        if (badge) {
+                            if (data.count > 0) {
+                                badge.textContent = data.count;
+                                badge.classList.remove('hidden');
+                            } else {
+                                badge.classList.add('hidden');
+                            }
+                        }
+                    });
+            }
+
+            // Update every 30 seconds
+            setInterval(updateNotifCount, 30000);
+            updateNotifCount();
+        </script>
+    @endauth
 </body>
+
 </html>

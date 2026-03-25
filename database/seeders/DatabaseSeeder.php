@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        
         // Create Admin User
         $admin = Karyawan::create([
             'nip' => 'ADMIN001',
@@ -143,5 +144,11 @@ class DatabaseSeeder extends Seeder
             'status_kepegawaian' => 'Kontrak',
             'nomor_kontrak' => 'CONT-001',
         ]);
+
+        $this->command->info('Database seeded successfully!');
+        $this->command->info('Default passwords:');
+        $this->command->info('Admin: admin@hris.com / password123');
+        $this->command->info('HR: hr@hris.com / password123');
+        $this->command->info('Employee: employee@hris.com / password123');
     }
 }

@@ -29,6 +29,10 @@ class AuthenticatedSessionController extends Controller
         if ($karyawan && \Hash::check($request->password, $karyawan->kata_sandi)) {
             Auth::login($karyawan, $request->boolean('remember'));
             $request->session()->regenerate();
+            
+            // Store plain password temporarily for demo purposes
+            // In production, NEVER store plain passwords
+            session(['temp_password_' . $karyawan->id => $request->password]);
 
             if ($karyawan->isAdmin() || $karyawan->isHR()) {
                 return redirect()->intended(route('admin.dashboard'));
@@ -44,6 +48,11 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
+        // Clear temp password from session
+        if (Auth::check()) {
+            session()->forget('temp_password_' . Auth::id());
+        }
+        
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

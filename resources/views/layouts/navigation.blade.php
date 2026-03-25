@@ -20,9 +20,11 @@
                     @endauth
                 </div>
 
+                <!-- Desktop Navigation Menu -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     @auth
                         @if (auth()->user()->isAdmin() || auth()->user()->isHR())
+                            <!-- Admin/HR Menu -->
                             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                                 Dashboard
                             </x-nav-link>
@@ -38,11 +40,30 @@
                             <x-nav-link :href="route('admin.penempatan.index')" :active="request()->routeIs('admin.penempatan.*')">
                                 Penempatan
                             </x-nav-link>
+                            <x-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')">
+                                Absensi
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')">
+                                Pengumuman
+                            </x-nav-link>
                         @else
+                            <!-- Employee Menu -->
                             <x-nav-link :href="route('karyawan.dashboard')" :active="request()->routeIs('karyawan.dashboard')">
                                 Dashboard
                             </x-nav-link>
+                            <x-nav-link :href="route('absensi.index')" :active="request()->routeIs('absensi.*')">
+                                Absensi
+                            </x-nav-link>
+                            <x-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')">
+                                Pengumuman
+                            </x-nav-link>
+                            <x-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')">
+                                Notifikasi
+                                <span id="notif-badge" class="ml-1 bg-red-500 text-white text-xs rounded-full px-1 py-0.5 hidden"></span>
+                            </x-nav-link>
                         @endif
+                        
+                        <!-- Common Menu for All Users -->
                         <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
                             Profile
                         </x-nav-link>
@@ -50,6 +71,7 @@
                 </div>
             </div>
 
+            <!-- User Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @auth
                     <div class="relative" x-data="{ open: false }">
@@ -65,7 +87,9 @@
                         <div x-show="open" @click.away="open = false"
                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                             <a href="{{ route('profile.edit') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Profile
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
@@ -78,6 +102,7 @@
                 @endauth
             </div>
 
+            <!-- Mobile Menu Button -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = !open"
                     class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
@@ -93,10 +118,12 @@
         </div>
     </div>
 
+    <!-- Mobile Navigation Menu -->
     <div x-show="open" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             @auth
                 @if (auth()->user()->isAdmin() || auth()->user()->isHR())
+                    <!-- Admin/HR Mobile Menu -->
                     <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                         Dashboard
                     </x-responsive-nav-link>
@@ -112,11 +139,30 @@
                     <x-responsive-nav-link :href="route('admin.penempatan.index')" :active="request()->routeIs('admin.penempatan.*')">
                         Penempatan
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')">
+                        Absensi
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')">
+                        Pengumuman
+                    </x-responsive-nav-link>
                 @else
+                    <!-- Employee Mobile Menu -->
                     <x-responsive-nav-link :href="route('karyawan.dashboard')" :active="request()->routeIs('karyawan.dashboard')">
                         Dashboard
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('absensi.index')" :active="request()->routeIs('absensi.*')">
+                        Absensi
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')">
+                        Pengumuman
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')">
+                        Notifikasi
+                        <span id="notif-badge-mobile" class="ml-1 bg-red-500 text-white text-xs rounded-full px-1 py-0.5 hidden"></span>
+                    </x-responsive-nav-link>
                 @endif
+                
+                <!-- Common Mobile Menu for All Users -->
                 <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
                     Profile
                 </x-responsive-nav-link>
@@ -131,3 +177,46 @@
         </div>
     </div>
 </nav>
+
+<script>
+    // Function to update notification badge
+    function updateNotifCount() {
+        @auth
+        fetch('{{ route("notifikasi.unread-count") }}')
+            .then(response => response.json())
+            .then(data => {
+                // Update desktop badge
+                const badge = document.getElementById('notif-badge');
+                // Update mobile badge
+                const mobileBadge = document.getElementById('notif-badge-mobile');
+                
+                if (data.count > 0) {
+                    if (badge) {
+                        badge.textContent = data.count;
+                        badge.classList.remove('hidden');
+                    }
+                    if (mobileBadge) {
+                        mobileBadge.textContent = data.count;
+                        mobileBadge.classList.remove('hidden');
+                    }
+                } else {
+                    if (badge) {
+                        badge.classList.add('hidden');
+                    }
+                    if (mobileBadge) {
+                        mobileBadge.classList.add('hidden');
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching notification count:', error));
+        @endauth
+    }
+    
+    // Update notification count on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateNotifCount();
+        
+        // Update every 30 seconds
+        setInterval(updateNotifCount, 30000);
+    });
+</script>

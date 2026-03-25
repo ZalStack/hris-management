@@ -4,12 +4,16 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PlacementController;
+use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Karyawan\DashboardController as KaryawanDashboardController;
 use Illuminate\Support\Facades\Route;
 
+// Redirect root to login
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Default dashboard route for authenticated users
@@ -22,10 +26,41 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
 });
 
+// Profile Routes (accessible by all authenticated users)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+});
+
+// Absensi Routes (for employees)
+Route::middleware('auth')->group(function () {
+    Route::prefix('absensi')->name('absensi.')->group(function () {
+        Route::get('/', [AbsensiController::class, 'index'])->name('index');
+        Route::get('/create', [AbsensiController::class, 'create'])->name('create');
+        Route::post('/', [AbsensiController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [AbsensiController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AbsensiController::class, 'update'])->name('update');
+        Route::post('/{id}/pulang', [AbsensiController::class, 'absensiPulang'])->name('pulang');
+    });
+});
+
+// Pengumuman Routes (for employees to view)
+Route::middleware('auth')->group(function () {
+    Route::prefix('pengumuman')->name('pengumuman.')->group(function () {
+        Route::get('/', [PengumumanController::class, 'employeeIndex'])->name('index');
+        Route::get('/{id}', [PengumumanController::class, 'employeeShow'])->name('show');
+    });
+});
+
+// Notifikasi Routes (for all authenticated users)
+Route::middleware('auth')->group(function () {
+    Route::prefix('notifikasi')->name('notifikasi.')->group(function () {
+        Route::get('/', [NotifikasiController::class, 'index'])->name('index');
+        Route::post('/{id}/read', [NotifikasiController::class, 'markAsRead'])->name('mark-read');
+        Route::post('/read-all', [NotifikasiController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::get('/unread-count', [NotifikasiController::class, 'getUnreadCount'])->name('unread-count');
+    });
 });
 
 // Admin/HR Routes
@@ -39,7 +74,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/karyawan/{id}/edit', [AdminDashboardController::class, 'editKaryawan'])->name('karyawan.edit');
     Route::put('/karyawan/{id}', [AdminDashboardController::class, 'updateKaryawan'])->name('karyawan.update');
     Route::delete('/karyawan/{id}', [AdminDashboardController::class, 'destroyKaryawan'])->name('karyawan.destroy');
-    Route::get('/karyawan/{id}/password', [AdminDashboardController::class, 'showKaryawanPassword'])->name('karyawan.password');
+    Route::get('/karyawan/{id}/show-password', [AdminDashboardController::class, 'showPassword'])->name('karyawan.show-password');
     
     // Department Management
     Route::resource('departemen', DepartmentController::class);
@@ -52,6 +87,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('penempatan', PlacementController::class);
     Route::get('/penempatan-karyawan', [PlacementController::class, 'index'])->name('penempatan.index');
     Route::get('/penempatan/karyawan/{id}', [PlacementController::class, 'getPlacementByKaryawan'])->name('penempatan.by-karyawan');
+    
+    // Absensi Management for Admin/HR
+    Route::prefix('absensi')->name('absensi.')->group(function () {
+        Route::get('/', [AbsensiController::class, 'adminIndex'])->name('index');
+        Route::put('/{id}/status', [AbsensiController::class, 'adminUpdateStatus'])->name('update-status');
+        Route::get('/{id}', [AbsensiController::class, 'adminShow'])->name('show');
+    });
+    
+    // Pengumuman Management for Admin/HR
+    Route::resource('pengumuman', PengumumanController::class);
 });
 
 // Employee Routes

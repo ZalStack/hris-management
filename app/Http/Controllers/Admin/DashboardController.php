@@ -23,7 +23,7 @@ class DashboardController extends Controller
 
     public function karyawan()
     {
-        $karyawans = Karyawan::with(['jabatanSaatIni.jabatan.departemen'])->orderBy('created_at', 'desc')->paginate(10);
+        $karyawans = Karyawan::with(['jabatanSaatIni.jabatan.departemen'])->paginate(10);
         $departemens = Departemen::all();
         $jabatans = Jabatan::with('departemen')->get();
         
@@ -33,104 +33,101 @@ class DashboardController extends Controller
     public function storeKaryawan(Request $request)
     {
         $request->validate([
-            'nip' => 'required|string|max:20|unique:karyawans,nip',
+            'nip' => 'required|unique:karyawans,nip',
             'email' => 'required|email|unique:karyawans,email',
             'nama_lengkap' => 'required|string|max:255',
             'password' => 'required|min:6',
             'role' => 'required|in:admin,hr,karyawan',
         ]);
 
-        try {
-            $karyawan = Karyawan::create([
-                'nip' => $request->nip,
-                'email' => $request->email,
-                'kata_sandi' => Hash::make($request->password),
-                'nama_lengkap' => $request->nama_lengkap,
-                'role' => $request->role,
-                'status' => 'aktif',
-                'tanggal_bergabung' => now(),
-            ]);
+        $karyawan = Karyawan::create([
+            'nip' => $request->nip,
+            'email' => $request->email,
+            'kata_sandi' => Hash::make($request->password),
+            'plain_password' => $request->password, // Store plain password temporarily
+            'nama_lengkap' => $request->nama_lengkap,
+            'role' => $request->role,
+            'status' => 'aktif',
+            'tanggal_bergabung' => now(),
+        ]);
 
-            return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil ditambahkan');
-        } catch (\Exception $e) {
-            return redirect()->route('admin.karyawan')->with('error', 'Gagal menambahkan karyawan: ' . $e->getMessage());
-        }
+        return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil ditambahkan. Password: ' . $request->password);
     }
 
     public function editKaryawan($id)
     {
-        try {
-            $karyawan = Karyawan::findOrFail($id);
-            return response()->json($karyawan);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Karyawan tidak ditemukan'], 404);
-        }
+        $karyawan = Karyawan::findOrFail($id);
+        return response()->json($karyawan);
     }
 
     public function updateKaryawan(Request $request, $id)
     {
-        try {
-            $karyawan = Karyawan::findOrFail($id);
-            
-            $request->validate([
-                'nip' => 'required|string|max:20|unique:karyawans,nip,' . $id,
-                'email' => 'required|email|unique:karyawans,email,' . $id,
-                'nama_lengkap' => 'required|string|max:255',
-                'role' => 'required|in:admin,hr,karyawan',
-            ]);
+        $karyawan = Karyawan::findOrFail($id);
+        
+        $request->validate([
+            'nip' => 'required|unique:karyawans,nip,' . $id,
+            'email' => 'required|email|unique:karyawans,email,' . $id,
+            'nama_lengkap' => 'required|string|max:255',
+            'role' => 'required|in:admin,hr,karyawan',
+        ]);
 
-            $updateData = [
-                'nip' => $request->nip,
-                'email' => $request->email,
-                'nama_lengkap' => $request->nama_lengkap,
-                'role' => $request->role,
-            ];
+        $updateData = [
+            'nip' => $request->nip,
+            'email' => $request->email,
+            'nama_lengkap' => $request->nama_lengkap,
+            'role' => $request->role,
+        ];
 
-            if ($request->filled('password')) {
-                $updateData['kata_sandi'] = Hash::make($request->password);
-            }
-
-            $karyawan->update($updateData);
-
-            return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil diupdate');
-        } catch (\Exception $e) {
-            return redirect()->route('admin.karyawan')->with('error', 'Gagal mengupdate karyawan: ' . $e->getMessage());
+        if ($request->filled('password')) {
+            $updateData['kata_sandi'] = Hash::make($request->password);
+            $updateData['plain_password'] = $request->password;
         }
+
+        $karyawan->update($updateData);
+
+        $message = 'Karyawan berhasil diupdate';
+        if ($request->filled('password')) {
+            $message .= '. Password baru: ' . $request->password;
+        }
+
+        return redirect()->route('admin.karyawan')->with('success', $message);
     }
 
     public function destroyKaryawan($id)
     {
-        try {
-            $karyawan = Karyawan::findOrFail($id);
-            
-            // Prevent deleting own account
-            if ($karyawan->id === auth()->id()) {
-                return redirect()->route('admin.karyawan')->with('error', 'Anda tidak dapat menghapus akun sendiri');
-            }
-            
-            // Prevent deleting if it's the last admin
-            if ($karyawan->role === 'admin' && Karyawan::where('role', 'admin')->count() <= 1) {
-                return redirect()->route('admin.karyawan')->with('error', 'Tidak dapat menghapus admin terakhir');
-            }
-            
-            $karyawan->delete();
-            
-            return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil dihapus');
-        } catch (\Exception $e) {
-            return redirect()->route('admin.karyawan')->with('error', 'Gagal menghapus karyawan: ' . $e->getMessage());
+        $karyawan = Karyawan::findOrFail($id);
+        
+        // Prevent deleting own account
+        if ($karyawan->id === auth()->id()) {
+            return redirect()->route('admin.karyawan')->with('error', 'Anda tidak dapat menghapus akun sendiri');
         }
+        
+        $karyawan->delete();
+        
+        return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil dihapus');
     }
 
-    public function showKaryawanPassword($id)
+    public function showPassword($id)
     {
-        try {
-            $karyawan = Karyawan::findOrFail($id);
+        $karyawan = Karyawan::findOrFail($id);
+        
+        // For security, we need to store plain password temporarily
+        // In production, you should use a password reset system
+        // This is just for demonstration as requested
+        $plainPassword = session('temp_password_' . $karyawan->id);
+        
+        if (!$plainPassword) {
+            // If password not in session, show message to reset
             return response()->json([
-                'hashed_password' => $karyawan->kata_sandi,
-                'message' => 'This is the hashed password. In production, password reset functionality should be used instead.'
+                'success' => false,
+                'message' => 'Password tidak tersedia. Silakan reset password jika diperlukan.'
             ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Karyawan tidak ditemukan'], 404);
         }
+        
+        return response()->json([
+            'success' => true,
+            'password' => $plainPassword,
+            'message' => 'Password untuk akun ' . $karyawan->nama_lengkap
+        ]);
     }
 }
