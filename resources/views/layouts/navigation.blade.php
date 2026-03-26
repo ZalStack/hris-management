@@ -53,6 +53,9 @@
                             <x-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Pengumuman
                             </x-nav-link>
+                            <x-nav-link :href="route('admin.penggajian.index')" :active="request()->routeIs('admin.penggajian.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Penggajian
+                            </x-nav-link>
                         @else
                             <!-- Employee Menu -->
                             <x-nav-link :href="route('karyawan.dashboard')" :active="request()->routeIs('karyawan.dashboard')" class="text-gray-700 hover:text-blue-600 transition">
@@ -69,6 +72,9 @@
                             </x-nav-link>
                             <x-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Pengumuman
+                            </x-nav-link>
+                            <x-nav-link :href="route('penggajian.index')" :active="request()->routeIs('penggajian.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Slip Gaji
                             </x-nav-link>
                             <x-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')" class="text-gray-700 hover:text-blue-600 transition relative">
                                 Notifikasi
@@ -228,6 +234,9 @@
                     <x-responsive-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="py-2">
                         Pengumuman
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.penggajian.index')" :active="request()->routeIs('admin.penggajian.*')" class="py-2">
+                        Penggajian
+                    </x-responsive-nav-link>
                 @else
                     <!-- Employee Mobile Menu -->
                     <x-responsive-nav-link :href="route('karyawan.dashboard')" :active="request()->routeIs('karyawan.dashboard')" class="py-2">
@@ -244,6 +253,9 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="py-2">
                         Pengumuman
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('penggajian.index')" :active="request()->routeIs('penggajian.*')" class="py-2">
+                        Slip Gaji
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')" class="py-2 relative">
                         Notifikasi
