@@ -34,19 +34,19 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <p class="text-gray-600 text-sm">Gaji Pokok</p>
-                                    <p class="font-semibold">Rp {{ number_format($penggajian->gaji_pokok, 0, ',', '.') }}</p>
+                                    <p class="font-semibold">Rp {{ $penggajian->gaji_pokok }}</p>
                                 </div>
                                 <div>
                                     <p class="text-gray-600 text-sm">Total Tunjangan</p>
-                                    <p class="font-semibold text-green-600">+ Rp {{ number_format($penggajian->total_tunjangan, 0, ',', '.') }}</p>
+                                    <p class="font-semibold text-green-600">+ Rp {{ $penggajian->total_tunjangan }}</p>
                                 </div>
                                 <div>
                                     <p class="text-gray-600 text-sm">Uang Lembur</p>
-                                    <p class="font-semibold text-green-600">+ Rp {{ number_format($penggajian->uang_lembur, 0, ',', '.') }}</p>
+                                    <p class="font-semibold text-green-600">+ Rp {{ $penggajian->uang_lembur }}</p>
                                 </div>
                                 <div>
                                     <p class="text-gray-600 text-sm">Bonus</p>
-                                    <p class="font-semibold text-green-600">+ Rp {{ number_format($penggajian->bonus, 0, ',', '.') }}</p>
+                                    <p class="font-semibold text-green-600">+ Rp {{ $penggajian->bonus }}</p>
                                 </div>
                             </div>
                             
@@ -54,15 +54,15 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <p class="text-gray-600 text-sm">Potongan Pajak</p>
-                                        <p class="font-semibold text-red-600">- Rp {{ number_format($penggajian->jumlah_pajak, 0, ',', '.') }}</p>
+                                        <p class="font-semibold text-red-600">- Rp {{ $penggajian->jumlah_pajak }}</p>
                                     </div>
                                     <div>
                                         <p class="text-gray-600 text-sm">Potongan BPJS</p>
-                                        <p class="font-semibold text-red-600">- Rp {{ number_format($penggajian->potongan_bpjs, 0, ',', '.') }}</p>
+                                        <p class="font-semibold text-red-600">- Rp {{ $penggajian->potongan_bpjs }}</p>
                                     </div>
                                     <div>
                                         <p class="text-gray-600 text-sm">Total Potongan</p>
-                                        <p class="font-semibold text-red-600">- Rp {{ number_format($penggajian->total_potongan, 0, ',', '.') }}</p>
+                                        <p class="font-semibold text-red-600">- Rp {{ $penggajian->total_potongan }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -71,12 +71,39 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <p class="text-gray-600 text-sm font-bold">Gaji Bersih</p>
-                                        <p class="text-2xl font-bold text-green-600">Rp {{ number_format($penggajian->gaji_bersih, 0, ',', '.') }}</p>
+                                        <p class="text-2xl font-bold text-green-600">Rp {{ $penggajian->gaji_bersih }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Detail Lembur -->
+                    @if($detailGaji && isset($detailGaji['detail_lembur']) && count($detailGaji['detail_lembur']) > 0)
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Detail Lembur</h3>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="text-gray-600 text-sm">
+                                        <th class="text-left">Tanggal</th>
+                                        <th class="text-left">Total Jam</th>
+                                        <th class="text-right">Nilai Lembur</th>
+                                     </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($detailGaji['detail_lembur'] as $lembur)
+                                     <tr>
+                                        <td class="py-1">{{ \Carbon\Carbon::parse($lembur['tanggal_lembur'])->format('d/m/Y') }}</td>
+                                        <td class="py-1">{{ number_format($lembur['total_jam'], 2) }} jam</td>
+                                        <td class="py-1 text-right">Rp {{ number_format($lembur['total_lembur'], 0, ',', '.') }}</td>
+                                     </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- Payment Info -->
                     @if($penggajian->status == 'paid')

@@ -36,14 +36,6 @@ class Penggajian extends Model
     ];
 
     protected $casts = [
-        'gaji_pokok' => 'decimal:2',
-        'total_tunjangan' => 'decimal:2',
-        'uang_lembur' => 'decimal:2',
-        'bonus' => 'decimal:2',
-        'total_potongan' => 'decimal:2',
-        'jumlah_pajak' => 'decimal:2',
-        'potongan_bpjs' => 'decimal:2',
-        'gaji_bersih' => 'decimal:2',
         'tanggal_pembayaran' => 'date',
     ];
 
@@ -86,28 +78,30 @@ class Penggajian extends Model
     {
         return $this->belongsTo(Karyawan::class, 'dibuat_oleh', 'nama_lengkap');
     }
-
-    // Calculate pajak (tax) based on salary
-    public static function hitungPajak($gajiKotor)
+    
+    // Helper to get numeric value
+    public function getGajiPokokNumeric()
     {
-        // Tax calculation: 5% for salary > 5 million, 15% for > 50 million, etc.
-        if ($gajiKotor <= 5000000) {
-            return 0;
-        } elseif ($gajiKotor <= 50000000) {
-            return $gajiKotor * 0.05;
-        } elseif ($gajiKotor <= 250000000) {
-            return $gajiKotor * 0.15;
-        } elseif ($gajiKotor <= 500000000) {
-            return $gajiKotor * 0.25;
-        } else {
-            return $gajiKotor * 0.30;
-        }
+        return (float) str_replace('.', '', $this->gaji_pokok);
     }
-
-    // Calculate BPJS (health insurance)
-    public static function hitungBPJS($gajiPokok)
+    
+    public function getTotalTunjanganNumeric()
     {
-        // BPJS: 1% from employee, 4% from company (total 5% of salary)
-        return $gajiPokok * 0.01;
+        return (float) str_replace('.', '', $this->total_tunjangan);
+    }
+    
+    public function getUangLemburNumeric()
+    {
+        return (float) str_replace('.', '', $this->uang_lembur);
+    }
+    
+    public function getBonusNumeric()
+    {
+        return (float) str_replace('.', '', $this->bonus);
+    }
+    
+    public function getGajiBersihNumeric()
+    {
+        return (float) str_replace('.', '', $this->gaji_bersih);
     }
 }
