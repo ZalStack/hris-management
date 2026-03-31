@@ -3,14 +3,12 @@
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\PositionController;
-use App\Http\Controllers\Admin\PlacementController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\CutiController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Karyawan\DashboardController as KaryawanDashboardController;
-use App\Http\Controllers\LemburController;
 use App\Http\Controllers\PenggajianController;
 use Illuminate\Support\Facades\Route;
 
@@ -61,19 +59,6 @@ Route::middleware('auth')
         Route::get('/{id}/edit', [CutiController::class, 'edit'])->name('edit');
         Route::put('/{id}', [CutiController::class, 'update'])->name('update');
         Route::delete('/{id}', [CutiController::class, 'destroy'])->name('destroy');
-    });
-
-// Lembur Routes (Employee)
-Route::middleware('auth')
-    ->prefix('lembur')
-    ->name('lembur.')
-    ->group(function () {
-        Route::get('/', [LemburController::class, 'index'])->name('index');
-        Route::get('/create', [LemburController::class, 'create'])->name('create');
-        Route::post('/', [LemburController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [LemburController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [LemburController::class, 'update'])->name('update');
-        Route::delete('/{id}', [LemburController::class, 'destroy'])->name('destroy');
     });
 
 // Pengumuman Routes (for employees to view)
@@ -130,11 +115,6 @@ Route::middleware(['auth', 'admin'])
         Route::resource('jabatan', PositionController::class);
         Route::get('/jabatan-by-departemen/{departemen_id}', [PositionController::class, 'getByDepartemen'])->name('jabatan.by-departemen');
 
-        // Employee Placement Management
-        Route::resource('penempatan', PlacementController::class);
-        Route::get('/penempatan-karyawan', [PlacementController::class, 'index'])->name('penempatan.index');
-        Route::get('/penempatan/karyawan/{id}', [PlacementController::class, 'getPlacementByKaryawan'])->name('penempatan.by-karyawan');
-
         // Absensi Management for Admin/HR
         Route::prefix('absensi')
             ->name('absensi.')
@@ -151,15 +131,6 @@ Route::middleware(['auth', 'admin'])
                 Route::get('/', [CutiController::class, 'adminIndex'])->name('index');
                 Route::put('/{id}/status', [CutiController::class, 'adminUpdateStatus'])->name('update-status');
                 Route::get('/{id}', [CutiController::class, 'adminShow'])->name('show');
-            });
-
-        // Lembur Management for Admin/HR
-        Route::prefix('lembur')
-            ->name('lembur.')
-            ->group(function () {
-                Route::get('/', [LemburController::class, 'adminIndex'])->name('index');
-                Route::put('/{id}/status', [LemburController::class, 'adminUpdateStatus'])->name('update-status');
-                Route::get('/{id}', [LemburController::class, 'adminShow'])->name('show');
             });
 
         // Penggajian Management

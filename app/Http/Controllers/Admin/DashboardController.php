@@ -23,7 +23,7 @@ class DashboardController extends Controller
 
     public function karyawan()
     {
-        $karyawans = Karyawan::with(['jabatanSaatIni.jabatan.departemen'])->paginate(10);
+        $karyawans = Karyawan::orderBy('created_at', 'desc')->paginate(10);
         $departemens = Departemen::all();
         $jabatans = Jabatan::with('departemen')->get();
         
@@ -44,14 +44,13 @@ class DashboardController extends Controller
             'nip' => $request->nip,
             'email' => $request->email,
             'kata_sandi' => Hash::make($request->password),
-            'plain_password' => $request->password, // Store plain password temporarily
             'nama_lengkap' => $request->nama_lengkap,
             'role' => $request->role,
             'status' => 'aktif',
             'tanggal_bergabung' => now(),
         ]);
 
-        return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil ditambahkan. Password: ' . $request->password);
+        return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil ditambahkan');
     }
 
     public function editKaryawan($id)
@@ -80,17 +79,11 @@ class DashboardController extends Controller
 
         if ($request->filled('password')) {
             $updateData['kata_sandi'] = Hash::make($request->password);
-            $updateData['plain_password'] = $request->password;
         }
 
         $karyawan->update($updateData);
 
-        $message = 'Karyawan berhasil diupdate';
-        if ($request->filled('password')) {
-            $message .= '. Password baru: ' . $request->password;
-        }
-
-        return redirect()->route('admin.karyawan')->with('success', $message);
+        return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil diupdate');
     }
 
     public function destroyKaryawan($id)
@@ -107,27 +100,12 @@ class DashboardController extends Controller
         return redirect()->route('admin.karyawan')->with('success', 'Karyawan berhasil dihapus');
     }
 
-    public function showPassword($id)
+    public function showKaryawanPassword($id)
     {
         $karyawan = Karyawan::findOrFail($id);
-        
-        // For security, we need to store plain password temporarily
-        // In production, you should use a password reset system
-        // This is just for demonstration as requested
-        $plainPassword = session('temp_password_' . $karyawan->id);
-        
-        if (!$plainPassword) {
-            // If password not in session, show message to reset
-            return response()->json([
-                'success' => false,
-                'message' => 'Password tidak tersedia. Silakan reset password jika diperlukan.'
-            ]);
-        }
-        
         return response()->json([
-            'success' => true,
-            'password' => $plainPassword,
-            'message' => 'Password untuk akun ' . $karyawan->nama_lengkap
+            'hashed_password' => $karyawan->kata_sandi,
+            'message' => 'This is the hashed password. In production, password reset functionality should be used instead.'
         ]);
     }
 }

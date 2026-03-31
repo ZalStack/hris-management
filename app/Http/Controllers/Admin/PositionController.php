@@ -74,13 +74,6 @@ class PositionController extends Controller
     public function destroy($id)
     {
         $jabatan = Jabatan::findOrFail($id);
-        
-        // Check if position has placements
-        if ($jabatan->penempatan()->count() > 0) {
-            return redirect()->route('admin.jabatan.index')
-                ->with('error', 'Jabatan tidak dapat dihapus karena masih memiliki karyawan yang ditempatkan');
-        }
-        
         $jabatan->delete();
         
         return redirect()->route('admin.jabatan.index')

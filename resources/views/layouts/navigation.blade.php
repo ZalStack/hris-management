@@ -38,17 +38,11 @@
                             <x-nav-link :href="route('admin.jabatan.index')" :active="request()->routeIs('admin.jabatan.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Jabatan
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.penempatan.index')" :active="request()->routeIs('admin.penempatan.*')" class="text-gray-700 hover:text-blue-600 transition">
-                                Penempatan
-                            </x-nav-link>
                             <x-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Absensi
                             </x-nav-link>
                             <x-nav-link :href="route('admin.cuti.index')" :active="request()->routeIs('admin.cuti.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Cuti
-                            </x-nav-link>
-                            <x-nav-link :href="route('admin.lembur.index')" :active="request()->routeIs('admin.lembur.*')" class="text-gray-700 hover:text-blue-600 transition">
-                                Lembur
                             </x-nav-link>
                             <x-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Pengumuman
@@ -66,9 +60,6 @@
                             </x-nav-link>
                             <x-nav-link :href="route('cuti.index')" :active="request()->routeIs('cuti.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Cuti
-                            </x-nav-link>
-                            <x-nav-link :href="route('lembur.index')" :active="request()->routeIs('lembur.*')" class="text-gray-700 hover:text-blue-600 transition">
-                                Lembur
                             </x-nav-link>
                             <x-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Pengumuman
@@ -219,17 +210,11 @@
                     <x-responsive-nav-link :href="route('admin.jabatan.index')" :active="request()->routeIs('admin.jabatan.*')" class="py-2">
                         Jabatan
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.penempatan.index')" :active="request()->routeIs('admin.penempatan.*')" class="py-2">
-                        Penempatan
-                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')" class="py-2">
                         Absensi
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.cuti.index')" :active="request()->routeIs('admin.cuti.*')" class="py-2">
                         Pengajuan Cuti
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.lembur.index')" :active="request()->routeIs('admin.lembur.*')" class="py-2">
-                        Pengajuan Lembur
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="py-2">
                         Pengumuman
@@ -247,9 +232,6 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('cuti.index')" :active="request()->routeIs('cuti.*')" class="py-2">
                         Pengajuan Cuti
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('lembur.index')" :active="request()->routeIs('lembur.*')" class="py-2">
-                        Pengajuan Lembur
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="py-2">
                         Pengumuman

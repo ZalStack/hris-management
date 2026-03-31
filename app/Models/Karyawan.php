@@ -59,18 +59,6 @@ class Karyawan extends Authenticatable
         return $this->hasMany(Departemen::class, 'kepala_departemen_id');
     }
 
-    public function penempatan()
-    {
-        return $this->hasMany(PenempatanKaryawan::class);
-    }
-
-    public function jabatanSaatIni()
-    {
-        return $this->hasOne(PenempatanKaryawan::class)
-            ->where('status', true)
-            ->with('jabatan');
-    }
-
     public function isAdmin()
     {
         return $this->role === 'admin';

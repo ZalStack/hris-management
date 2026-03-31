@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Departemen;
-use App\Models\PenempatanKaryawan;
 
 class Jabatan extends Model
 {
@@ -20,13 +18,13 @@ class Jabatan extends Model
         'gaji_maksimal',
     ];
 
+    protected $casts = [
+        'gaji_minimal' => 'decimal:2',
+        'gaji_maksimal' => 'decimal:2',
+    ];
+
     public function departemen()
     {
         return $this->belongsTo(Departemen::class);
-    }
-
-    public function penempatan()
-    {
-        return $this->hasMany(PenempatanKaryawan::class);
     }
 }
