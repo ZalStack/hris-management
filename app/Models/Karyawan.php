@@ -11,7 +11,7 @@ class Karyawan extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $table = 'karyawans';
-    
+
     protected $fillable = [
         'nip',
         'email',
@@ -67,5 +67,10 @@ class Karyawan extends Authenticatable
     public function isHR()
     {
         return $this->role === 'hr';
+    }
+
+    public function penggajian()
+    {
+        return $this->hasMany(Penggajian::class, 'karyawan_id');
     }
 }
