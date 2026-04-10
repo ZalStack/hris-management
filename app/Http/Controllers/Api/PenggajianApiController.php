@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class PenggajianApiController extends Controller
 {
-    /**
-     * GET /api/penggajian
-     * Get all payroll data
-     */
     public function index(Request $request)
     {
         $query = Penggajian::with('karyawan')->orderBy('id', 'desc');
@@ -48,10 +44,6 @@ class PenggajianApiController extends Controller
         ], 200);
     }
     
-    /**
-     * GET /api/penggajian/{id}
-     * Get single payroll data
-     */
     public function show($id)
     {
         $penggajian = Penggajian::with('karyawan')->find($id);
@@ -70,10 +62,6 @@ class PenggajianApiController extends Controller
         ], 200);
     }
     
-    /**
-     * POST /api/penggajian
-     * Create new payroll
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -162,10 +150,6 @@ class PenggajianApiController extends Controller
         ], 201);
     }
     
-    /**
-     * PUT /api/penggajian/{id}
-     * Update payroll
-     */
     public function update(Request $request, $id)
     {
         $penggajian = Penggajian::find($id);
@@ -214,10 +198,6 @@ class PenggajianApiController extends Controller
         ], 200);
     }
     
-    /**
-     * DELETE /api/penggajian/{id}
-     * Delete payroll
-     */
     public function destroy($id)
     {
         $penggajian = Penggajian::find($id);
@@ -244,10 +224,6 @@ class PenggajianApiController extends Controller
         ], 200);
     }
     
-    /**
-     * PATCH /api/penggajian/{id}/status
-     * Update status only
-     */
     public function updateStatus(Request $request, $id)
     {
         $penggajian = Penggajian::find($id);
@@ -297,11 +273,7 @@ class PenggajianApiController extends Controller
             'data' => $penggajian
         ], 200);
     }
-    
-    /**
-     * GET /api/penggajian/karyawan/{karyawan_id}
-     * Get payroll by employee
-     */
+
     public function getByKaryawan($karyawan_id)
     {
         $karyawan = Karyawan::find($karyawan_id);
@@ -340,10 +312,6 @@ class PenggajianApiController extends Controller
         ], 200);
     }
     
-    /**
-     * GET /api/penggajian/report/summary
-     * Get summary report
-     */
     public function getSummary(Request $request)
     {
         $query = Penggajian::query();

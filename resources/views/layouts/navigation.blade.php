@@ -44,11 +44,14 @@
                             <x-nav-link :href="route('admin.cuti.index')" :active="request()->routeIs('admin.cuti.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Cuti
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
-                                Pengumuman
-                            </x-nav-link>
                             <x-nav-link :href="route('admin.penggajian.index')" :active="request()->routeIs('admin.penggajian.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Penggajian
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.performa.index')" :active="request()->routeIs('admin.performa.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Performa
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Pengumuman
                             </x-nav-link>
                         @else
                             <!-- Employee Menu -->
@@ -61,11 +64,14 @@
                             <x-nav-link :href="route('cuti.index')" :active="request()->routeIs('cuti.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Cuti
                             </x-nav-link>
-                            <x-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
-                                Pengumuman
-                            </x-nav-link>
                             <x-nav-link :href="route('penggajian.index')" :active="request()->routeIs('penggajian.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Slip Gaji
+                            </x-nav-link>
+                            <x-nav-link :href="route('performa.index')" :active="request()->routeIs('performa.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Performa
+                            </x-nav-link>
+                            <x-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="text-gray-700 hover:text-blue-600 transition">
+                                Pengumuman
                             </x-nav-link>
                             <x-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')" class="text-gray-700 hover:text-blue-600 transition relative">
                                 Notifikasi
@@ -216,11 +222,14 @@
                     <x-responsive-nav-link :href="route('admin.cuti.index')" :active="request()->routeIs('admin.cuti.*')" class="py-2">
                         Pengajuan Cuti
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="py-2">
-                        Pengumuman
-                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.penggajian.index')" :active="request()->routeIs('admin.penggajian.*')" class="py-2">
                         Penggajian
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.performa.index')" :active="request()->routeIs('admin.performa.*')" class="py-2">
+                        Penilaian Performa
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.pengumuman.index')" :active="request()->routeIs('admin.pengumuman.*')" class="py-2">
+                        Pengumuman
                     </x-responsive-nav-link>
                 @else
                     <!-- Employee Mobile Menu -->
@@ -233,11 +242,14 @@
                     <x-responsive-nav-link :href="route('cuti.index')" :active="request()->routeIs('cuti.*')" class="py-2">
                         Pengajuan Cuti
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="py-2">
-                        Pengumuman
-                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('penggajian.index')" :active="request()->routeIs('penggajian.*')" class="py-2">
                         Slip Gaji
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('performa.index')" :active="request()->routeIs('performa.*')" class="py-2">
+                        Penilaian Performa
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('pengumuman.index')" :active="request()->routeIs('pengumuman.*')" class="py-2">
+                        Pengumuman
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('notifikasi.index')" :active="request()->routeIs('notifikasi.*')" class="py-2 relative">
                         Notifikasi

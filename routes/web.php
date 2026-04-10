@@ -10,6 +10,7 @@ use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Karyawan\DashboardController as KaryawanDashboardController;
 use App\Http\Controllers\PenggajianController;
+use App\Http\Controllers\PerformaController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -33,6 +34,15 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 });
+
+// Performa Routes (Employee - View only)
+Route::middleware('auth')
+    ->prefix('performa')
+    ->name('performa.')
+    ->group(function () {
+        Route::get('/', [PerformaController::class, 'index'])->name('index');
+        Route::get('/{id}', [PerformaController::class, 'show'])->name('show');
+    });
 
 // Absensi Routes (for employees)
 Route::middleware('auth')->group(function () {
@@ -151,6 +161,23 @@ Route::middleware(['auth', 'admin'])
 
         // Pengumuman Management for Admin/HR
         Route::resource('pengumuman', PengumumanController::class);
+
+        // Performa Management
+        Route::prefix('performa')
+            ->name('performa.')
+            ->group(function () {
+                Route::get('/', [PerformaController::class, 'adminIndex'])->name('index');
+                Route::get('/create', [PerformaController::class, 'adminCreate'])->name('create');
+                Route::get('/bulk', [PerformaController::class, 'adminBulkCreate'])->name('bulk');
+                Route::post('/bulk', [PerformaController::class, 'adminBulkStore'])->name('bulk.store');
+                Route::get('/karyawan/{id}', [PerformaController::class, 'getKaryawanData'])->name('get-karyawan');
+                Route::post('/', [PerformaController::class, 'adminStore'])->name('store');
+                Route::get('/{id}/edit', [PerformaController::class, 'adminEdit'])->name('edit');
+                Route::put('/{id}', [PerformaController::class, 'adminUpdate'])->name('update');
+                Route::delete('/{id}', [PerformaController::class, 'adminDestroy'])->name('destroy');
+                Route::get('/{id}', [PerformaController::class, 'adminShow'])->name('show');
+                Route::post('/check-reset', [PerformaController::class, 'checkAndResetKPI'])->name('check-reset');
+            });
     });
 
 // Employee Routes

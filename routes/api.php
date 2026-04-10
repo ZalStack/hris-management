@@ -3,12 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PenggajianApiController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-*/
-
 Route::get('/penggajian', [PenggajianApiController::class, 'index']);
 Route::get('/penggajian/{id}', [PenggajianApiController::class, 'show']);
 Route::post('/penggajian', [PenggajianApiController::class, 'store']);
