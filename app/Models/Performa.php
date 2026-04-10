@@ -44,7 +44,19 @@ class Performa extends Model
         'performance_score' => 'integer',
     ];
 
-    // Calculate performance score
+    // Calculate KPI Score from Quality, Productivity, Teamwork, Discipline
+    public static function calculateKPIScore($quality, $productivity, $teamwork, $discipline)
+    {
+        return round(($quality + $productivity + $teamwork + $discipline) / 4);
+    }
+
+    // Calculate Attendance Rate (same as KPI Score)
+    public static function calculateAttendanceRate($kpiScore)
+    {
+        return $kpiScore;
+    }
+
+    // Calculate performance score with weights
     public static function calculatePerformanceScore($attendance_rate, $quality, $productivity, $teamwork, $discipline, $kpi_score)
     {
         // Weight distribution

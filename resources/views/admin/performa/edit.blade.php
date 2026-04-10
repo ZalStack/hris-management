@@ -9,6 +9,15 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
+                    <div class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4">
+                        <p class="text-blue-700 text-sm">
+                            <strong>Informasi Perhitungan Otomatis:</strong><br>
+                            - KPI Score = Rata-rata dari (Productivity + Discipline + Quality + Teamwork)<br>
+                            - Attendance Rate = Sama dengan KPI Score<br>
+                            - Performance Score = Perhitungan berbobot dari semua komponen
+                        </p>
+                    </div>
+
                     <form method="POST" action="{{ route('admin.performa.update', $performa->id) }}" id="performaForm">
                         @csrf
                         @method('PUT')
@@ -68,22 +77,11 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-gray-700 text-sm font-bold mb-2">Attendance Rate *</label>
-                                    <input type="number" id="attendance_rate" name="attendance_rate" value="{{ old('attendance_rate', $performa->attendance_rate) }}" 
-                                        min="0" max="100" required
-                                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        onchange="calculateTotal()">
-                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                        <div id="attendance_bar" class="bg-blue-600 rounded-full h-2" style="width: {{ $performa->attendance_rate }}%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div>
                                     <label class="block text-gray-700 text-sm font-bold mb-2">Quality *</label>
                                     <input type="number" id="quality" name="quality" value="{{ old('quality', $performa->quality) }}" 
                                         min="0" max="100" required
                                         class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        onchange="calculateTotal()">
+                                        onchange="calculateAll()" onkeyup="calculateAll()">
                                     <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                         <div id="quality_bar" class="bg-green-600 rounded-full h-2" style="width: {{ $performa->quality }}%"></div>
                                     </div>
@@ -94,7 +92,7 @@
                                     <input type="number" id="productivity" name="productivity" value="{{ old('productivity', $performa->productivity) }}" 
                                         min="0" max="100" required
                                         class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        onchange="calculateTotal()">
+                                        onchange="calculateAll()" onkeyup="calculateAll()">
                                     <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                         <div id="productivity_bar" class="bg-yellow-600 rounded-full h-2" style="width: {{ $performa->productivity }}%"></div>
                                     </div>
@@ -105,7 +103,7 @@
                                     <input type="number" id="teamwork" name="teamwork" value="{{ old('teamwork', $performa->teamwork) }}" 
                                         min="0" max="100" required
                                         class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        onchange="calculateTotal()">
+                                        onchange="calculateAll()" onkeyup="calculateAll()">
                                     <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                         <div id="teamwork_bar" class="bg-purple-600 rounded-full h-2" style="width: {{ $performa->teamwork }}%"></div>
                                     </div>
@@ -116,31 +114,44 @@
                                     <input type="number" id="discipline" name="discipline" value="{{ old('discipline', $performa->discipline) }}" 
                                         min="0" max="100" required
                                         class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        onchange="calculateTotal()">
+                                        onchange="calculateAll()" onkeyup="calculateAll()">
                                     <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                         <div id="discipline_bar" class="bg-indigo-600 rounded-full h-2" style="width: {{ $performa->discipline }}%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 text-sm font-bold mb-2">KPI Score *</label>
-                                    <input type="number" id="kpi_score" name="kpi_score" value="{{ old('kpi_score', $performa->kpi_score) }}" 
-                                        min="0" max="100" required
-                                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        onchange="calculateTotal()">
-                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                        <div id="kpi_bar" class="bg-red-600 rounded-full h-2" style="width: {{ $performa->kpi_score }}%"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="border-t pt-6 mb-6">
-                            <div class="bg-blue-50 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Hasil Perhitungan Otomatis</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-blue-50 rounded-lg p-4">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">KPI Score (Otomatis)</label>
+                                    <div class="text-3xl font-bold text-blue-600" id="kpi_score_display">{{ $performa->kpi_score }}</div>
+                                    <input type="hidden" id="kpi_score" name="kpi_score" value="{{ $performa->kpi_score }}">
+                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                        <div id="kpi_bar" class="bg-blue-600 rounded-full h-2" style="width: {{ $performa->kpi_score }}%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-green-50 rounded-lg p-4">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">Attendance Rate (Otomatis)</label>
+                                    <div class="text-3xl font-bold text-green-600" id="attendance_rate_display">{{ $performa->attendance_rate }}</div>
+                                    <input type="hidden" id="attendance_rate" name="attendance_rate" value="{{ $performa->attendance_rate }}">
+                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                        <div id="attendance_bar" class="bg-green-600 rounded-full h-2" style="width: {{ $performa->attendance_rate }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t pt-6 mb-6">
+                            <div class="bg-purple-50 rounded-lg p-4">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-gray-700 text-sm font-bold mb-2">Total Performance Score</label>
-                                        <div class="text-3xl font-bold text-green-600" id="performance_score_display">{{ $performa->performance_score }}</div>
+                                        <div class="text-3xl font-bold text-purple-600" id="performance_score_display">{{ $performa->performance_score }}</div>
                                         <input type="hidden" id="performance_score" name="performance_score" value="{{ $performa->performance_score }}">
                                     </div>
                                     <div>
@@ -179,30 +190,42 @@
     </div>
 
     <script>
-        function calculateTotal() {
+        function calculateAll() {
             // Get all values
-            let attendance = parseInt(document.getElementById('attendance_rate').value) || 0;
             let quality = parseInt(document.getElementById('quality').value) || 0;
             let productivity = parseInt(document.getElementById('productivity').value) || 0;
             let teamwork = parseInt(document.getElementById('teamwork').value) || 0;
             let discipline = parseInt(document.getElementById('discipline').value) || 0;
-            let kpi = parseInt(document.getElementById('kpi_score').value) || 0;
             
-            // Update progress bars
-            document.getElementById('attendance_bar').style.width = attendance + '%';
+            // Update progress bars for input fields
             document.getElementById('quality_bar').style.width = quality + '%';
             document.getElementById('productivity_bar').style.width = productivity + '%';
             document.getElementById('teamwork_bar').style.width = teamwork + '%';
             document.getElementById('discipline_bar').style.width = discipline + '%';
-            document.getElementById('kpi_bar').style.width = kpi + '%';
             
-            // Calculate weighted score
-            let total = (attendance * 0.15) + 
+            // Calculate KPI Score (average of quality, productivity, teamwork, discipline)
+            let kpiScore = Math.round((quality + productivity + teamwork + discipline) / 4);
+            
+            // Calculate Attendance Rate (same as KPI Score)
+            let attendanceRate = kpiScore;
+            
+            // Update KPI Score display
+            document.getElementById('kpi_score').value = kpiScore;
+            document.getElementById('kpi_score_display').innerText = kpiScore;
+            document.getElementById('kpi_bar').style.width = kpiScore + '%';
+            
+            // Update Attendance Rate display
+            document.getElementById('attendance_rate').value = attendanceRate;
+            document.getElementById('attendance_rate_display').innerText = attendanceRate;
+            document.getElementById('attendance_bar').style.width = attendanceRate + '%';
+            
+            // Calculate Performance Score with weights
+            let total = (attendanceRate * 0.15) + 
                        (quality * 0.20) + 
                        (productivity * 0.20) + 
                        (teamwork * 0.15) + 
                        (discipline * 0.15) + 
-                       (kpi * 0.15);
+                       (kpiScore * 0.15);
             
             total = Math.round(total);
             
@@ -233,6 +256,6 @@
         }
         
         // Initial calculation
-        calculateTotal();
+        calculateAll();
     </script>
 </x-app-layout>

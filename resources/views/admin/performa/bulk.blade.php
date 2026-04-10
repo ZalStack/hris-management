@@ -9,11 +9,6 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <div class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4">
-                        <p class="text-blue-700">Fitur ini memungkinkan Anda menambahkan penilaian performa untuk semua
-                            karyawan sekaligus dalam satu periode.</p>
-                    </div>
-
                     <form method="POST" action="{{ route('admin.performa.bulk.store') }}" id="bulkForm">
                         @csrf
 
@@ -63,13 +58,13 @@
                                 <thead>
                                     <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                                         <th class="py-3 px-4 text-left">Karyawan</th>
-                                        <th class="py-3 px-4 text-left">Attendance</th>
                                         <th class="py-3 px-4 text-left">Quality</th>
                                         <th class="py-3 px-4 text-left">Productivity</th>
                                         <th class="py-3 px-4 text-left">Teamwork</th>
                                         <th class="py-3 px-4 text-left">Discipline</th>
-                                        <th class="py-3 px-4 text-left">KPI</th>
-                                        <th class="py-3 px-4 text-left">Total</th>
+                                        <th class="py-3 px-6 text-left">Attendance</th>
+                                        <th class="py-3 px-6 text-left">KPI</th>
+                                        <th class="py-3 px-6 text-left">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-gray-600 text-sm font-light">
@@ -80,51 +75,51 @@
                                                 <small class="text-gray-500">{{ $karyawan->nip }}</small>
                                                 <input type="hidden" name="performas[{{ $index }}][karyawan_id]"
                                                     value="{{ $karyawan->id }}">
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                <input type="number"
-                                                    name="performas[{{ $index }}][attendance_rate]"
-                                                    class="attendance shadow border rounded w-20 py-1 px-2 text-center"
-                                                    min="0" max="100" value="0"
-                                                    onchange="calculateRowTotal(this)">
-                                            </td>
                                             <td class="py-3 px-4">
                                                 <input type="number" name="performas[{{ $index }}][quality]"
                                                     class="quality shadow border rounded w-20 py-1 px-2 text-center"
                                                     min="0" max="100" value="0"
-                                                    onchange="calculateRowTotal(this)">
+                                                    onchange="calculateRowTotal(this)"
+                                                    onkeyup="calculateRowTotal(this)">
                                             </td>
                                             <td class="py-3 px-4">
                                                 <input type="number"
                                                     name="performas[{{ $index }}][productivity]"
                                                     class="productivity shadow border rounded w-20 py-1 px-2 text-center"
                                                     min="0" max="100" value="0"
-                                                    onchange="calculateRowTotal(this)">
+                                                    onchange="calculateRowTotal(this)"
+                                                    onkeyup="calculateRowTotal(this)">
                                             </td>
                                             <td class="py-3 px-4">
                                                 <input type="number" name="performas[{{ $index }}][teamwork]"
                                                     class="teamwork shadow border rounded w-20 py-1 px-2 text-center"
                                                     min="0" max="100" value="0"
-                                                    onchange="calculateRowTotal(this)">
+                                                    onchange="calculateRowTotal(this)"
+                                                    onkeyup="calculateRowTotal(this)">
                                             </td>
                                             <td class="py-3 px-4">
                                                 <input type="number" name="performas[{{ $index }}][discipline]"
                                                     class="discipline shadow border rounded w-20 py-1 px-2 text-center"
                                                     min="0" max="100" value="0"
-                                                    onchange="calculateRowTotal(this)">
+                                                    onchange="calculateRowTotal(this)"
+                                                    onkeyup="calculateRowTotal(this)">
+                                            </td>
+                                            <td class="py-3 px-6 text-left">
+                                                <span
+                                                    class="font-semibold text-green-600">{{ $item->attendance_rate }}%</span>
+                                            </td>
+                                            <td class="py-3 px-6 text-left font-bold text-blue-600">
+                                                {{ $item->kpi_score }}%
                                             </td>
                                             <td class="py-3 px-4">
-                                                <input type="number" name="performas[{{ $index }}][kpi_score]"
-                                                    class="kpi shadow border rounded w-20 py-1 px-2 text-center"
-                                                    min="0" max="100" value="0"
-                                                    onchange="calculateRowTotal(this)">
+                                                <span class="total-display font-bold text-purple-600">0</span>
+                                                <input type="hidden"
+                                                    name="performas[{{ $index }}][performance_score]"
+                                                    class="total-input" value="0">
                                             </td>
-                                            <td class="py-3 px-4">
-                                                <span class="row-total font-bold text-green-600">0</span>
-                                            </td>
-                            </table>
-                            @endforeach
-                            </tbody>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
                             </table>
                         </div>
 
@@ -147,33 +142,54 @@
     <script>
         function calculateRowTotal(element) {
             const row = element.closest('tr');
-            const attendance = parseInt(row.querySelector('.attendance').value) || 0;
             const quality = parseInt(row.querySelector('.quality').value) || 0;
             const productivity = parseInt(row.querySelector('.productivity').value) || 0;
             const teamwork = parseInt(row.querySelector('.teamwork').value) || 0;
             const discipline = parseInt(row.querySelector('.discipline').value) || 0;
-            const kpi = parseInt(row.querySelector('.kpi').value) || 0;
 
+            // Calculate KPI Score (average of quality, productivity, teamwork, discipline)
+            const kpiScore = Math.round((quality + productivity + teamwork + discipline) / 4);
+
+            // Calculate Attendance Rate (same as KPI Score)
+            const attendanceRate = kpiScore;
+
+            // Calculate Performance Score with weights
             const total = Math.round(
-                (attendance * 0.15) +
+                (attendanceRate * 0.15) +
                 (quality * 0.20) +
                 (productivity * 0.20) +
                 (teamwork * 0.15) +
                 (discipline * 0.15) +
-                (kpi * 0.15)
+                (kpiScore * 0.15)
             );
 
-            row.querySelector('.row-total').innerText = total;
+            // Update displays
+            row.querySelector('.kpi-display').innerText = kpiScore;
+            row.querySelector('.kpi-input').value = kpiScore;
+
+            row.querySelector('.attendance-display').innerText = attendanceRate;
+            row.querySelector('.attendance-input').value = attendanceRate;
+
+            row.querySelector('.total-display').innerText = total;
+            row.querySelector('.total-input').value = total;
         }
 
         // Add event listeners to all inputs
-        document.querySelectorAll('.attendance, .quality, .productivity, .teamwork, .discipline, .kpi').forEach(input => {
+        document.querySelectorAll('.quality, .productivity, .teamwork, .discipline').forEach(input => {
             input.addEventListener('change', function() {
                 calculateRowTotal(this);
             });
             input.addEventListener('keyup', function() {
                 calculateRowTotal(this);
             });
+        });
+
+        // Initialize all rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const inputs = row.querySelectorAll('.quality, .productivity, .teamwork, .discipline');
+            if (inputs.length > 0) {
+                calculateRowTotal(inputs[0]);
+            }
         });
     </script>
 </x-app-layout>

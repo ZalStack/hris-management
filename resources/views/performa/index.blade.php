@@ -49,16 +49,16 @@
                                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                                     <th class="py-3 px-6 text-left">Periode</th>
                                     <th class="py-3 px-6 text-left">Quarter</th>
-                                    <th class="py-3 px-6 text-left">Attendance</th>
                                     <th class="py-3 px-6 text-left">Quality</th>
                                     <th class="py-3 px-6 text-left">Productivity</th>
                                     <th class="py-3 px-6 text-left">Teamwork</th>
                                     <th class="py-3 px-6 text-left">Discipline</th>
                                     <th class="py-3 px-6 text-left">KPI Score</th>
+                                    <th class="py-3 px-6 text-left">Attendance</th>
                                     <th class="py-3 px-6 text-left">Total Score</th>
                                     <th class="py-3 px-6 text-left">Rating</th>
                                     <th class="py-3 px-6 text-center">Aksi</th>
-                                  </tr>
+                                </tr>
                             </thead>
                             <tbody class="text-gray-600 text-sm font-light">
                                 @forelse($performas as $item)
@@ -66,12 +66,6 @@
                                     <td class="py-3 px-6 text-left">{{ $item->bulan_text }} {{ $item->tahun }}</td>
                                     <td class="py-3 px-6 text-left">
                                         <span class="bg-gray-200 text-gray-800 py-1 px-2 rounded text-xs">{{ $item->quarter }}</span>
-                                    </td>
-                                    <td class="py-3 px-6 text-left">
-                                        <div class="w-full bg-gray-200 rounded-full h-2">
-                                            <div class="bg-blue-600 rounded-full h-2" style="width: {{ $item->attendance_rate }}%"></div>
-                                        </div>
-                                        <span class="text-xs">{{ $item->attendance_rate }}%</span>
                                     </td>
                                     <td class="py-3 px-6 text-left">
                                         <div class="w-full bg-gray-200 rounded-full h-2">
@@ -97,7 +91,13 @@
                                         </div>
                                         <span class="text-xs">{{ $item->discipline }}%</span>
                                     </td>
-                                    <td class="py-3 px-6 text-left font-semibold">{{ $item->kpi_score }}%</td>
+                                    <td class="py-3 px-6 text-left font-semibold text-blue-600">{{ $item->kpi_score }}%</td>
+                                    <td class="py-3 px-6 text-left">
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-green-600 rounded-full h-2" style="width: {{ $item->attendance_rate }}%"></div>
+                                        </div>
+                                        <span class="text-xs">{{ $item->attendance_rate }}%</span>
+                                    </td>
                                     <td class="py-3 px-6 text-left font-bold text-lg">{{ $item->performance_score }}</td>
                                     <td class="py-3 px-6 text-left">
                                         <span class="bg-{{ $item->rating['color'] }}-100 text-{{ $item->rating['color'] }}-800 py-1 px-3 rounded-full text-xs">

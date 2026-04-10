@@ -149,12 +149,10 @@ class PerformaController extends Controller
             'karyawan_id' => 'required|exists:karyawans,id',
             'bulan' => 'required|integer|between:1,12',
             'tahun' => 'required|integer|min:2020',
-            'attendance_rate' => 'required|integer|min:0|max:100',
             'quality' => 'required|integer|min:0|max:100',
             'productivity' => 'required|integer|min:0|max:100',
             'teamwork' => 'required|integer|min:0|max:100',
             'discipline' => 'required|integer|min:0|max:100',
-            'kpi_score' => 'required|integer|min:0|max:100',
             'catatan' => 'nullable',
         ]);
         
@@ -171,14 +169,25 @@ class PerformaController extends Controller
             }
         }
         
+        // Calculate KPI Score from Quality, Productivity, Teamwork, Discipline
+        $kpiScore = Performa::calculateKPIScore(
+            $request->quality,
+            $request->productivity,
+            $request->teamwork,
+            $request->discipline
+        );
+        
+        // Calculate Attendance Rate (same as KPI Score)
+        $attendanceRate = Performa::calculateAttendanceRate($kpiScore);
+        
         // Calculate performance score
         $performanceScore = Performa::calculatePerformanceScore(
-            $request->attendance_rate,
+            $attendanceRate,
             $request->quality,
             $request->productivity,
             $request->teamwork,
             $request->discipline,
-            $request->kpi_score
+            $kpiScore
         );
         
         // Determine quarter
@@ -215,12 +224,12 @@ class PerformaController extends Controller
             'join_date' => $karyawan->tanggal_bergabung ?? now(),
             'bulan' => $request->bulan,
             'tahun' => $request->tahun,
-            'attendance_rate' => $request->attendance_rate,
+            'attendance_rate' => $attendanceRate,
             'quality' => $request->quality,
             'productivity' => $request->productivity,
             'teamwork' => $request->teamwork,
             'discipline' => $request->discipline,
-            'kpi_score' => $request->kpi_score,
+            'kpi_score' => $kpiScore,
             'performance_score' => $performanceScore,
             'catatan' => $request->catatan,
             'quarter' => $quarter,
@@ -256,12 +265,10 @@ class PerformaController extends Controller
             'karyawan_id' => 'required|exists:karyawans,id',
             'bulan' => 'required|integer|between:1,12',
             'tahun' => 'required|integer|min:2020',
-            'attendance_rate' => 'required|integer|min:0|max:100',
             'quality' => 'required|integer|min:0|max:100',
             'productivity' => 'required|integer|min:0|max:100',
             'teamwork' => 'required|integer|min:0|max:100',
             'discipline' => 'required|integer|min:0|max:100',
-            'kpi_score' => 'required|integer|min:0|max:100',
             'catatan' => 'nullable',
         ]);
         
@@ -278,14 +285,25 @@ class PerformaController extends Controller
             }
         }
         
+        // Calculate KPI Score from Quality, Productivity, Teamwork, Discipline
+        $kpiScore = Performa::calculateKPIScore(
+            $request->quality,
+            $request->productivity,
+            $request->teamwork,
+            $request->discipline
+        );
+        
+        // Calculate Attendance Rate (same as KPI Score)
+        $attendanceRate = Performa::calculateAttendanceRate($kpiScore);
+        
         // Calculate performance score
         $performanceScore = Performa::calculatePerformanceScore(
-            $request->attendance_rate,
+            $attendanceRate,
             $request->quality,
             $request->productivity,
             $request->teamwork,
             $request->discipline,
-            $request->kpi_score
+            $kpiScore
         );
         
         // Determine quarter
@@ -323,12 +341,12 @@ class PerformaController extends Controller
             'join_date' => $karyawan->tanggal_bergabung ?? now(),
             'bulan' => $request->bulan,
             'tahun' => $request->tahun,
-            'attendance_rate' => $request->attendance_rate,
+            'attendance_rate' => $attendanceRate,
             'quality' => $request->quality,
             'productivity' => $request->productivity,
             'teamwork' => $request->teamwork,
             'discipline' => $request->discipline,
-            'kpi_score' => $request->kpi_score,
+            'kpi_score' => $kpiScore,
             'performance_score' => $performanceScore,
             'catatan' => $request->catatan,
             'quarter' => $quarter,
@@ -377,12 +395,10 @@ class PerformaController extends Controller
             'tahun' => 'required|integer|min:2020',
             'performas' => 'required|array',
             'performas.*.karyawan_id' => 'required|exists:karyawans,id',
-            'performas.*.attendance_rate' => 'required|integer|min:0|max:100',
             'performas.*.quality' => 'required|integer|min:0|max:100',
             'performas.*.productivity' => 'required|integer|min:0|max:100',
             'performas.*.teamwork' => 'required|integer|min:0|max:100',
             'performas.*.discipline' => 'required|integer|min:0|max:100',
-            'performas.*.kpi_score' => 'required|integer|min:0|max:100',
         ]);
         
         $bulan = $request->bulan;
@@ -416,14 +432,25 @@ class PerformaController extends Controller
                 }
             }
             
+            // Calculate KPI Score
+            $kpiScore = Performa::calculateKPIScore(
+                $data['quality'],
+                $data['productivity'],
+                $data['teamwork'],
+                $data['discipline']
+            );
+            
+            // Calculate Attendance Rate
+            $attendanceRate = Performa::calculateAttendanceRate($kpiScore);
+            
             // Calculate performance score
             $performanceScore = Performa::calculatePerformanceScore(
-                $data['attendance_rate'],
+                $attendanceRate,
                 $data['quality'],
                 $data['productivity'],
                 $data['teamwork'],
                 $data['discipline'],
-                $data['kpi_score']
+                $kpiScore
             );
             
             // Check if exists
@@ -443,12 +470,12 @@ class PerformaController extends Controller
                     'join_date' => $karyawan->tanggal_bergabung ?? now(),
                     'bulan' => $bulan,
                     'tahun' => $tahun,
-                    'attendance_rate' => $data['attendance_rate'],
+                    'attendance_rate' => $attendanceRate,
                     'quality' => $data['quality'],
                     'productivity' => $data['productivity'],
                     'teamwork' => $data['teamwork'],
                     'discipline' => $data['discipline'],
-                    'kpi_score' => $data['kpi_score'],
+                    'kpi_score' => $kpiScore,
                     'performance_score' => $performanceScore,
                     'quarter' => $quarter,
                 ]);
@@ -485,23 +512,8 @@ class PerformaController extends Controller
         return $bulanNama[$bulan];
     }
 
-    // Auto reset KPI score for new quarter
     public function checkAndResetKPI()
     {
-        $currentMonth = Carbon::now()->month;
-        $currentYear = Carbon::now()->year;
-        
-        // Determine current quarter
-        if ($currentMonth >= 1 && $currentMonth <= 3) {
-            $currentQuarter = 'Q1';
-        } elseif ($currentMonth >= 4 && $currentMonth <= 6) {
-            $currentQuarter = 'Q2';
-        } elseif ($currentMonth >= 7 && $currentMonth <= 9) {
-            $currentQuarter = 'Q3';
-        } else {
-            $currentQuarter = 'Q4';
-        }
-        
         return response()->json(['success' => true, 'message' => 'System ready for new assessments']);
     }
 }

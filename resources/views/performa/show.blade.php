@@ -51,16 +51,6 @@
                         <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between mb-1">
-                                    <span class="text-gray-700">Attendance Rate</span>
-                                    <span class="font-semibold">{{ $performa->attendance_rate }}%</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-600 rounded-full h-2" style="width: {{ $performa->attendance_rate }}%"></div>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <div class="flex justify-between mb-1">
                                     <span class="text-gray-700">Quality</span>
                                     <span class="font-semibold">{{ $performa->quality }}%</span>
                                 </div>
@@ -102,21 +92,33 @@
                             <div>
                                 <div class="flex justify-between mb-1">
                                     <span class="text-gray-700 font-bold">KPI Score</span>
-                                    <span class="font-semibold">{{ $performa->kpi_score }}%</span>
+                                    <span class="font-semibold text-blue-600">{{ $performa->kpi_score }}%</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-red-600 rounded-full h-2" style="width: {{ $performa->kpi_score }}%"></div>
+                                    <div class="bg-blue-600 rounded-full h-2" style="width: {{ $performa->kpi_score }}%"></div>
                                 </div>
+                                <p class="text-xs text-gray-500 mt-1">Rata-rata dari Quality, Productivity, Teamwork, Discipline</p>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-700">Attendance Rate</span>
+                                    <span class="font-semibold text-green-600">{{ $performa->attendance_rate }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-600 rounded-full h-2" style="width: {{ $performa->attendance_rate }}%"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Sama dengan KPI Score</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Total Score -->
-                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 mb-6">
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 mb-6">
                         <div class="text-center">
                             <p class="text-white text-sm">Total Performance Score</p>
                             <p class="text-white text-5xl font-bold">{{ $performa->performance_score }}</p>
-                            <p class="text-blue-100 text-sm mt-2">Dari skala 0-100</p>
+                            <p class="text-purple-100 text-sm mt-2">Dari skala 0-100</p>
                         </div>
                     </div>
 
@@ -129,19 +131,6 @@
                         </div>
                     </div>
                     @endif
-
-                    <!-- Weight Information -->
-                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                        <h4 class="font-semibold text-gray-700 mb-2">Bobot Penilaian</h4>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-                            <div>Attendance Rate: 15%</div>
-                            <div>Quality: 20%</div>
-                            <div>Productivity: 20%</div>
-                            <div>Teamwork: 15%</div>
-                            <div>Discipline: 15%</div>
-                            <div>KPI Score: 15%</div>
-                        </div>
-                    </div>
 
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-2">
