@@ -116,35 +116,6 @@ class DatabaseSeeder extends Seeder
             'gaji_maksimal' => 10000000,
         ]);
 
-        // Create Employee Placements
-        PenempatanKaryawan::create([
-            'karyawan_id' => $employee->id,
-            'jabatan_id' => $developer->id,
-            'tanggal_mulai' => now(),
-            'status' => true,
-            'gaji_pokok' => 7000000,
-            'status_kepegawaian' => 'Tetap',
-        ]);
-
-        PenempatanKaryawan::create([
-            'karyawan_id' => $hr->id,
-            'jabatan_id' => $hrManager->id,
-            'tanggal_mulai' => now(),
-            'status' => true,
-            'gaji_pokok' => 12000000,
-            'status_kepegawaian' => 'Tetap',
-        ]);
-
-        PenempatanKaryawan::create([
-            'karyawan_id' => $admin->id,
-            'jabatan_id' => $itManager->id,
-            'tanggal_mulai' => now(),
-            'status' => true,
-            'gaji_pokok' => 15000000,
-            'status_kepegawaian' => 'Kontrak',
-            'nomor_kontrak' => 'CONT-001',
-        ]);
-
         $this->command->info('Database seeded successfully!');
         $this->command->info('Default passwords:');
         $this->command->info('Admin: admin@hris.com / password123');

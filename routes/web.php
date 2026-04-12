@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{id}/edit', [AbsensiController::class, 'edit'])->name('edit');
             Route::put('/{id}', [AbsensiController::class, 'update'])->name('update');
             Route::post('/{id}/pulang', [AbsensiController::class, 'absensiPulang'])->name('pulang');
+            Route::delete('/{id}', [AbsensiController::class, 'cancelChangeDay'])->name('destroy');
         });
 });
 

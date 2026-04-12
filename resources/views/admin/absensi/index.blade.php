@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Manajemen Absensi Karyawan
+            Manajemen Absensi & Change Day
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
                 <div class="bg-white rounded-lg shadow p-4">
                     <div class="text-gray-500 text-sm">Total</div>
                     <div class="text-2xl font-bold">{{ $statistics['total'] }}</div>
@@ -33,8 +33,13 @@
                     <div class="text-red-600 text-sm">Alpha</div>
                     <div class="text-2xl font-bold text-red-600">{{ $statistics['alpha'] }}</div>
                 </div>
+                <div class="bg-indigo-50 rounded-lg shadow p-4">
+                    <div class="text-indigo-600 text-sm">Change Day Pending</div>
+                    <div class="text-2xl font-bold text-indigo-600">{{ $statistics['change_day_pending'] }}</div>
+                </div>
             </div>
 
+            <!-- Data Table -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="overflow-x-auto">
@@ -43,56 +48,77 @@
                                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                                     <th class="py-3 px-6 text-left">Tanggal</th>
                                     <th class="py-3 px-6 text-left">Karyawan</th>
+                                    <th class="py-3 px-6 text-left">Tipe</th>
                                     <th class="py-3 px-6 text-left">Jam Masuk</th>
                                     <th class="py-3 px-6 text-left">Jam Pulang</th>
                                     <th class="py-3 px-6 text-left">Total Jam</th>
-                                    <th class="py-3 px-6 text-left">Status Saat Ini</th>
-                                    <th class="py-3 px-6 text-left">Aksi Persetujuan</th>
-                                    <th class="py-3 px-6 text-center">Detail</th>
+                                    <th class="py-3 px-6 text-left">Status</th>
+                                    <th class="py-3 px-6 text-center">Aksi</th>
                                   </tr>
                             </thead>
                             <tbody class="text-gray-600 text-sm font-light">
                                 @forelse($absensi as $item)
                                 <tr class="border-b border-gray-200 hover:bg-gray-100">
-                                    <td class="py-3 px-6 text-left">{{ $item->tanggal->format('d/m/Y') }}</td>
                                     <td class="py-3 px-6 text-left">
-                                        {{ $item->karyawan->nama_lengkap }}<br>
-                                        <small class="text-gray-500">{{ $item->karyawan->nip }}</small>
-                                    </td>
-                                    <td class="py-3 px-6 text-left">{{ $item->jam_masuk ? \Carbon\Carbon::parse($item->jam_masuk)->format('H:i') : '-' }}</td>
-                                    <td class="py-3 px-6 text-left">{{ $item->jam_pulang ? \Carbon\Carbon::parse($item->jam_pulang)->format('H:i') : '-' }}</td>
-                                    <td class="py-3 px-6 text-left">{{ $item->total_jam_kerja ? number_format($item->total_jam_kerja, 2) . ' jam' : '-' }}</td>
-                                    <td class="py-3 px-6 text-left">
-                                        @php
-                                            $statusColors = [
-                                                'pending' => 'yellow',
-                                                'hadir' => 'green',
-                                                'izin' => 'blue',
-                                                'sakit' => 'purple',
-                                                'alpha' => 'red'
-                                            ];
-                                            $color = $statusColors[$item->status_kehadiran] ?? 'gray';
-                                        @endphp
-                                        <span class="bg-{{ $color }}-200 text-{{ $color }}-800 py-1 px-3 rounded-full text-xs">
-                                            {{ strtoupper($item->status_kehadiran) }}
-                                        </span>
+                                        {{ $item->tanggal ? $item->tanggal->format('d/m/Y') : '-' }}
                                     </td>
                                     <td class="py-3 px-6 text-left">
-                                        <form action="{{ route('admin.absensi.update-status', $item->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('PUT')
-                                            <select name="status_kehadiran" onchange="confirmStatusChange(this)" 
-                                                class="text-sm rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                                                <option value="pending" {{ $item->status_kehadiran == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
-                                                <option value="hadir" {{ $item->status_kehadiran == 'hadir' ? 'selected' : '' }}>✅ Setujui - Hadir</option>
-                                                <option value="izin" {{ $item->status_kehadiran == 'izin' ? 'selected' : '' }}>📝 Setujui - Izin</option>
-                                                <option value="sakit" {{ $item->status_kehadiran == 'sakit' ? 'selected' : '' }}>🤒 Setujui - Sakit</option>
-                                                <option value="alpha" {{ $item->status_kehadiran == 'alpha' ? 'selected' : '' }}>❌ Tolak - Alpha</option>
-                                            </select>
-                                        </form>
+                                        {{ $item->karyawan->nama_lengkap ?? $item->nama_karyawan }}<br>
+                                        <small class="text-gray-500">{{ $item->karyawan->nip ?? '-' }}</small>
+                                    </td>
+                                    <td class="py-3 px-6 text-left">
+                                        @if($item->is_change_day)
+                                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">Change Day</span>
+                                            @if($item->change_day_status == 'pending')
+                                                <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded ml-1">Pending</span>
+                                            @endif
+                                        @else
+                                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-0.5 rounded">Regular</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-3 px-6 text-left">
+                                        @if($item->is_change_day && $item->change_day_status == 'approved')
+                                            {{ $item->change_day_jam_mulai ? substr($item->change_day_jam_mulai, 0, 5) : '-' }}
+                                        @else
+                                            {{ $item->jam_masuk ? \Carbon\Carbon::parse($item->jam_masuk)->format('H:i') : '-' }}
+                                        @endif
+                                    </td>
+                                    <td class="py-3 px-6 text-left">
+                                        @if($item->is_change_day && $item->change_day_status == 'approved')
+                                            {{ $item->change_day_jam_selesai ? substr($item->change_day_jam_selesai, 0, 5) : '-' }}
+                                        @else
+                                            {{ $item->jam_pulang ? \Carbon\Carbon::parse($item->jam_pulang)->format('H:i') : '-' }}
+                                        @endif
+                                    </td>
+                                    <td class="py-3 px-6 text-left">
+                                        {{ $item->total_jam_kerja ? number_format($item->total_jam_kerja, 2) . ' jam' : '-' }}
+                                    </td>
+                                    <td class="py-3 px-6 text-left">
+                                        @if($item->is_change_day)
+                                            {!! $item->change_day_status_badge !!}
+                                        @else
+                                            <form action="{{ route('admin.absensi.update-status', $item->id) }}" method="POST" class="inline-block" id="form-{{ $item->id }}">
+                                                @csrf
+                                                @method('PUT')
+                                                <select name="status_kehadiran" onchange="updateStatus({{ $item->id }})" 
+                                                    class="text-xs rounded-full py-1 px-3 border-0 focus:ring-2 focus:ring-blue-500
+                                                    @if($item->status_kehadiran == 'pending') bg-yellow-100 text-yellow-800
+                                                    @elseif($item->status_kehadiran == 'hadir') bg-green-100 text-green-800
+                                                    @elseif($item->status_kehadiran == 'izin') bg-blue-100 text-blue-800
+                                                    @elseif($item->status_kehadiran == 'sakit') bg-purple-100 text-purple-800
+                                                    @else bg-red-100 text-red-800
+                                                    @endif">
+                                                    <option value="pending" {{ $item->status_kehadiran == 'pending' ? 'selected' : '' }}>Pending</option>
+                                                    <option value="hadir" {{ $item->status_kehadiran == 'hadir' ? 'selected' : '' }}>Hadir</option>
+                                                    <option value="izin" {{ $item->status_kehadiran == 'izin' ? 'selected' : '' }}>Izin</option>
+                                                    <option value="sakit" {{ $item->status_kehadiran == 'sakit' ? 'selected' : '' }}>Sakit</option>
+                                                    <option value="alpha" {{ $item->status_kehadiran == 'alpha' ? 'selected' : '' }}>Alpha</option>
+                                                </select>
+                                            </form>
+                                        @endif
                                     </td>
                                     <td class="py-3 px-6 text-center">
-                                        <button onclick="viewDetail({{ $item->id }})" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs">
+                                        <button onclick="showDetail({{ $item->id }})" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs">
                                             Detail
                                         </button>
                                     </td>
@@ -116,72 +142,135 @@
 
     <!-- Modal Detail -->
     <div id="detailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
             <div class="mt-3">
                 <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Detail Absensi</h3>
                 <div id="detailContent"></div>
-                <div class="mt-4 flex justify-end">
-                    <button type="button" onclick="closeDetailModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                        Tutup
-                    </button>
+                <div class="mt-4">
+                    <form id="statusForm" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="status_kehadiran" id="statusKehadiranInput">
+                        <input type="hidden" name="change_day_status" id="changeDayStatusInput">
+                        <div id="catatanSection" style="display: none;">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Catatan (Opsional)</label>
+                            <textarea name="change_day_catatan_admin" id="catatanAdmin" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                        </div>
+                        <div class="mt-4 flex justify-end space-x-2">
+                            <button type="button" onclick="closeDetailModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                Tutup
+                            </button>
+                            <button type="submit" id="submitBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                Update Status
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function confirmStatusChange(select) {
-            const selectedValue = select.value;
-            let message = '';
-            
-            switch(selectedValue) {
-                case 'hadir':
-                    message = 'Setujui absensi ini sebagai HADIR?';
-                    break;
-                case 'izin':
-                    message = 'Setujui absensi ini sebagai IZIN?';
-                    break;
-                case 'sakit':
-                    message = 'Setujui absensi ini sebagai SAKIT?';
-                    break;
-                case 'alpha':
-                    message = 'Tolak absensi ini (ALPHA)?';
-                    break;
-                default:
-                    message = 'Ubah status absensi?';
-            }
-            
-            if (confirm(message)) {
-                select.form.submit();
-            } else {
-                select.value = select.getAttribute('data-original-value') || 'pending';
-            }
+        let currentItem = null;
+        let isChangeDay = false;
+        
+        function updateStatus(id) {
+            document.getElementById(`form-${id}`).submit();
         }
         
-        function viewDetail(id) {
+        function showDetail(id) {
             fetch(`/admin/absensi/${id}`)
                 .then(response => response.json())
                 .then(data => {
-                    const content = `
-                        <div class="space-y-2">
-                            <p><strong>Nama:</strong> ${data.karyawan.nama_lengkap}</p>
-                            <p><strong>NIP:</strong> ${data.karyawan.nip}</p>
+                    currentItem = data;
+                    isChangeDay = data.is_change_day;
+                    
+                    let content = `
+                        <div class="space-y-2 mb-4">
+                            <p><strong>Nama Karyawan:</strong> ${data.karyawan?.nama_lengkap || data.nama_karyawan}</p>
+                            <p><strong>NIP:</strong> ${data.karyawan?.nip || '-'}</p>
                             <p><strong>Tanggal:</strong> ${new Date(data.tanggal).toLocaleDateString('id-ID')}</p>
+                    `;
+                    
+                    if (data.is_change_day) {
+                        content += `
+                            <p><strong>Tipe:</strong> Change Day</p>
+                            <p><strong>Tanggal Change Day:</strong> ${new Date(data.change_day_tanggal_awal).toLocaleDateString('id-ID')} - ${new Date(data.change_day_tanggal_akhir).toLocaleDateString('id-ID')}</p>
+                            <p><strong>Jam Change Day:</strong> ${data.change_day_jam_mulai?.substring(0,5)} - ${data.change_day_jam_selesai?.substring(0,5)}</p>
+                            <p><strong>Alasan Change Day:</strong> ${data.change_day_alasan || '-'}</p>
+                            <p><strong>Status Change Day:</strong> ${data.change_day_status}</p>
+                        `;
+                    } else {
+                        content += `
                             <p><strong>Jam Masuk:</strong> ${data.jam_masuk ? data.jam_masuk.substring(0,5) : '-'}</p>
                             <p><strong>Lokasi Masuk:</strong> ${data.lokasi_masuk || '-'}</p>
                             <p><strong>Jam Pulang:</strong> ${data.jam_pulang ? data.jam_pulang.substring(0,5) : '-'}</p>
                             <p><strong>Lokasi Pulang:</strong> ${data.lokasi_pulang || '-'}</p>
                             <p><strong>Total Jam Kerja:</strong> ${data.total_jam_kerja ? data.total_jam_kerja + ' jam' : '-'}</p>
-                            <p><strong>Keterangan:</strong> ${data.keterangan || '-'}</p>
-                        </div>
-                    `;
+                            <p><strong>Status Kehadiran:</strong> ${data.status_kehadiran}</p>
+                        `;
+                    }
+                    
+                    content += `<p><strong>Keterangan:</strong> ${data.keterangan || '-'}</p>`;
+                    
+                    if (data.change_day_catatan_admin) {
+                        content += `<p><strong>Catatan Admin:</strong> ${data.change_day_catatan_admin}</p>`;
+                    }
+                    
+                    content += `</div>`;
+                    
                     document.getElementById('detailContent').innerHTML = content;
+                    
+                    // Setup form for status update
+                    const statusForm = document.getElementById('statusForm');
+                    const catatanSection = document.getElementById('catatanSection');
+                    const statusKehadiranInput = document.getElementById('statusKehadiranInput');
+                    const changeDayStatusInput = document.getElementById('changeDayStatusInput');
+                    
+                    if (data.is_change_day) {
+                        catatanSection.style.display = 'block';
+                        statusKehadiranInput.disabled = true;
+                        changeDayStatusInput.disabled = false;
+                        
+                        // Create select for change day status
+                        const selectHtml = `
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Status Change Day</label>
+                                <select name="change_day_status" id="changeDaySelect" class="shadow border rounded w-full py-2 px-3" required>
+                                    <option value="pending" ${data.change_day_status == 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="approved" ${data.change_day_status == 'approved' ? 'selected' : ''}>Disetujui</option>
+                                    <option value="rejected" ${data.change_day_status == 'rejected' ? 'selected' : ''}>Ditolak</option>
+                                </select>
+                            </div>
+                        `;
+                        document.getElementById('catatanSection').insertAdjacentHTML('beforebegin', selectHtml);
+                        
+                        statusForm.action = `/admin/absensi/${data.id}/status`;
+                    } else {
+                        catatanSection.style.display = 'none';
+                        statusKehadiranInput.disabled = false;
+                        changeDayStatusInput.disabled = true;
+                        statusForm.action = `/admin/absensi/${data.id}/status`;
+                    }
+                    
                     document.getElementById('detailModal').classList.remove('hidden');
                 });
         }
         
         function closeDetailModal() {
             document.getElementById('detailModal').classList.add('hidden');
+            const selectElement = document.getElementById('changeDaySelect');
+            if (selectElement) {
+                selectElement.remove();
+            }
+            currentItem = null;
         }
+        
+        document.getElementById('statusForm').addEventListener('submit', function(e) {
+            const changeDaySelect = document.getElementById('changeDaySelect');
+            if (changeDaySelect) {
+                document.getElementById('changeDayStatusInput').value = changeDaySelect.value;
+            }
+        });
     </script>
 </x-app-layout>
