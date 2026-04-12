@@ -63,8 +63,9 @@
                             <thead>
                                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                                     <th class="py-3 px-6 text-left">Tanggal</th>
-                                    <th class="py-3 px-6 text-left">Jam Masuk</th>
-                                    <th class="py-3 px-6 text-left">Jam Pulang</th>
+                                    <th class="py-3 px-6 text-left">Tipe</th>
+                                    <th class="py-3 px-6 text-left">Jam Masuk/Mulai</th>
+                                    <th class="py-3 px-6 text-left">Jam Pulang/Selesai</th>
                                     <th class="py-3 px-6 text-left">Total Jam</th>
                                     <th class="py-3 px-6 text-left">Status</th>
                                     <th class="py-3 px-6 text-left">Keterangan</th>
@@ -74,10 +75,26 @@
                             <tbody class="text-gray-600 text-sm font-light">
                                 @forelse($absensi as $item)
                                 <tr class="border-b border-gray-200 hover:bg-gray-100">
-                                    <td class="py-3 px-6 text-left">
-                                        {{ $item->tanggal->format('d/m/Y') }}
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">
                                         @if($item->is_change_day)
-                                            <span class="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">Change Day</span>
+                                            @if($item->change_day_tanggal_awal && $item->change_day_tanggal_akhir)
+                                                @if($item->change_day_tanggal_awal->format('Y-m-d') == $item->change_day_tanggal_akhir->format('Y-m-d'))
+                                                    {{ $item->change_day_tanggal_awal->format('d/m/Y') }}
+                                                @else
+                                                    {{ $item->change_day_tanggal_awal->format('d/m/Y') }} - {{ $item->change_day_tanggal_akhir->format('d/m/Y') }}
+                                                @endif
+                                            @else
+                                                {{ $item->tanggal->format('d/m/Y') }}
+                                            @endif
+                                        @else
+                                            {{ $item->tanggal->format('d/m/Y') }}
+                                        @endif
+                                    </td>
+                                    <td class="py-3 px-6 text-left">
+                                        @if($item->is_change_day)
+                                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">Change Day</span>
+                                        @else
+                                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-0.5 rounded">Regular</span>
                                         @endif
                                     </td>
                                     <td class="py-3 px-6 text-left">
@@ -104,9 +121,15 @@
                                                     'rejected' => 'red'
                                                 ];
                                                 $color = $statusColors[$item->change_day_status] ?? 'gray';
+                                                $statusText = [
+                                                    'pending' => 'PENDING',
+                                                    'approved' => 'DISETUJUI',
+                                                    'rejected' => 'DITOLAK'
+                                                ];
+                                                $text = $statusText[$item->change_day_status] ?? strtoupper($item->change_day_status);
                                             @endphp
                                             <span class="bg-{{ $color }}-200 text-{{ $color }}-800 py-1 px-3 rounded-full text-xs">
-                                                {{ strtoupper($item->change_day_status) }}
+                                                {{ $text }}
                                             </span>
                                         @else
                                             @php
@@ -126,20 +149,24 @@
                                     </td>
                                     <td class="py-3 px-6 text-left">
                                         @if($item->is_change_day && $item->change_day_alasan)
-                                            <button onclick="showAlasan('{{ addslashes($item->change_day_alasan) }}')" class="text-blue-600 hover:text-blue-800">
+                                            <button onclick="showDetail('{{ addslashes($item->change_day_alasan) }}', 'Alasan Change Day')" class="text-blue-600 hover:text-blue-800">
                                                 Lihat Alasan
                                             </button>
                                         @elseif($item->keterangan)
-                                            <button onclick="showKeterangan('{{ addslashes($item->keterangan) }}')" class="text-blue-600 hover:text-blue-800">
-                                                Lihat Keterangan
+                                            <button onclick="showDetail('{{ addslashes($item->keterangan) }}', 'Keterangan')" class="text-blue-600 hover:text-blue-800">
+                                                Lihat
                                             </button>
                                         @else
                                             -
                                         @endif
                                     </td>
                                     <td class="py-3 px-6 text-center">
-                                        @if($item->is_change_day && $item->change_day_status == 'pending')
-                                            <div class="flex item-center justify-center space-x-2">
+                                        <div class="flex item-center justify-center space-x-2">
+                                            <button onclick="showDetailModal({{ $item->id }})" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs">
+                                                Detail
+                                            </button>
+                                            
+                                            @if($item->is_change_day && $item->change_day_status == 'pending')
                                                 <a href="{{ route('absensi.edit', $item->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded text-xs">
                                                     Edit
                                                 </a>
@@ -150,17 +177,19 @@
                                                         Batal
                                                     </button>
                                                 </form>
-                                            </div>
-                                        @elseif(!$item->is_change_day && $item->status_kehadiran == 'pending' && !$item->jam_pulang)
-                                            <a href="{{ route('absensi.edit', $item->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded text-xs">
-                                                Edit
-                                            </a>
-                                        @endif
+                                            @elseif(!$item->is_change_day && $item->status_kehadiran == 'pending' && !$item->jam_pulang)
+                                                <a href="{{ route('absensi.edit', $item->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded text-xs">
+                                                    Edit
+                                                </a>
+                                            @else
+                                                <span class="text-gray-400 text-xs">-</span>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">Belum ada data absensi</td>
+                                    <td colspan="8" class="text-center py-4">Belum ada data absensi</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -185,7 +214,8 @@
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Jam Pulang</label>
                         <input type="time" name="jam_pulang" id="jam_pulang" required 
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            value="{{ date('H:i') }}">
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Lokasi Pulang</label>
@@ -206,14 +236,29 @@
         </div>
     </div>
 
-    <!-- Modal Alasan Change Day -->
-    <div id="alasanModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <!-- Modal Detail -->
+    <div id="detailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Detail Absensi</h3>
+                <div id="detailContent" class="space-y-2"></div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" onclick="closeDetailModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Keterangan -->
+    <div id="keteranganModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Alasan Change Day</h3>
-                <div id="alasanContent" class="text-gray-600"></div>
+                <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4" id="keteranganTitle">Detail</h3>
+                <div id="keteranganContent" class="text-gray-600"></div>
                 <div class="mt-4 flex justify-end">
-                    <button type="button" onclick="closeAlasanModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                    <button type="button" onclick="closeKeteranganModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                         Tutup
                     </button>
                 </div>
@@ -231,18 +276,61 @@
             document.getElementById('pulangModal').classList.add('hidden');
         }
         
-        function showAlasan(alasan) {
-            document.getElementById('alasanContent').innerHTML = alasan;
-            document.getElementById('alasanModal').classList.remove('hidden');
+        function showDetail(content, title) {
+            document.getElementById('keteranganTitle').innerText = title;
+            document.getElementById('keteranganContent').innerText = content;
+            document.getElementById('keteranganModal').classList.remove('hidden');
         }
         
-        function closeAlasanModal() {
-            document.getElementById('alasanModal').classList.add('hidden');
+        function closeKeteranganModal() {
+            document.getElementById('keteranganModal').classList.add('hidden');
         }
 
-        function showKeterangan(keterangan) {
-            document.getElementById('alasanContent').innerHTML = keterangan;
-            document.getElementById('alasanModal').classList.remove('hidden');
+        function showDetailModal(id) {
+            fetch(`/absensi/${id}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    let content = '';
+                    
+                    if (data.is_change_day) {
+                        content = `
+                            <p><strong>Nama Karyawan:</strong> ${data.karyawan?.nama_lengkap || data.nama_karyawan}</p>
+                            <p><strong>Tipe:</strong> Change Day</p>
+                            <p><strong>Tanggal Change Day:</strong> ${data.change_day_tanggal_awal ? new Date(data.change_day_tanggal_awal).toLocaleDateString('id-ID') : '-'} - ${data.change_day_tanggal_akhir ? new Date(data.change_day_tanggal_akhir).toLocaleDateString('id-ID') : '-'}</p>
+                            <p><strong>Jam Change Day:</strong> ${data.change_day_jam_mulai?.substring(0,5) || '-'} - ${data.change_day_jam_selesai?.substring(0,5) || '-'}</p>
+                            <p><strong>Alasan Change Day:</strong> ${data.change_day_alasan || '-'}</p>
+                            <p><strong>Status Change Day:</strong> ${data.change_day_status}</p>
+                            ${data.change_day_catatan_admin ? `<p><strong>Catatan Admin:</strong> ${data.change_day_catatan_admin}</p>` : ''}
+                        `;
+                    } else {
+                        content = `
+                            <p><strong>Nama Karyawan:</strong> ${data.karyawan?.nama_lengkap || data.nama_karyawan}</p>
+                            <p><strong>Tanggal:</strong> ${new Date(data.tanggal).toLocaleDateString('id-ID')}</p>
+                            <p><strong>Jam Masuk:</strong> ${data.jam_masuk ? data.jam_masuk.substring(0,5) : '-'}</p>
+                            <p><strong>Lokasi Masuk:</strong> ${data.lokasi_masuk || '-'}</p>
+                            <p><strong>Jam Pulang:</strong> ${data.jam_pulang ? data.jam_pulang.substring(0,5) : '-'}</p>
+                            <p><strong>Lokasi Pulang:</strong> ${data.lokasi_pulang || '-'}</p>
+                            <p><strong>Total Jam Kerja:</strong> ${data.total_jam_kerja ? data.total_jam_kerja + ' jam' : '-'}</p>
+                            <p><strong>Status Kehadiran:</strong> ${data.status_kehadiran}</p>
+                        `;
+                    }
+                    
+                    content += `<p><strong>Keterangan:</strong> ${data.keterangan || '-'}</p>`;
+                    
+                    document.getElementById('detailContent').innerHTML = content;
+                    document.getElementById('detailModal').classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Gagal memuat detail data');
+                });
+        }
+        
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
         }
     </script>
 </x-app-layout>

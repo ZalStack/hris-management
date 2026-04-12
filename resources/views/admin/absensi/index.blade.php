@@ -33,6 +33,10 @@
                     <div class="text-red-600 text-sm">Alpha</div>
                     <div class="text-2xl font-bold text-red-600">{{ $statistics['alpha'] }}</div>
                 </div>
+                <div class="bg-indigo-50 rounded-lg shadow p-4">
+                    <div class="text-indigo-600 text-sm">Change Day Pending</div>
+                    <div class="text-2xl font-bold text-indigo-600">{{ $statistics['change_day_pending'] }}</div>
+                </div>
             </div>
 
             <!-- Data Table -->
@@ -45,8 +49,8 @@
                                     <th class="py-3 px-6 text-left">Tanggal</th>
                                     <th class="py-3 px-6 text-left">Karyawan</th>
                                     <th class="py-3 px-6 text-left">Tipe</th>
-                                    <th class="py-3 px-6 text-left">Jam Masuk</th>
-                                    <th class="py-3 px-6 text-left">Jam Pulang</th>
+                                    <th class="py-3 px-6 text-left">Jam Masuk/Mulai</th>
+                                    <th class="py-3 px-6 text-left">Jam Pulang/Selesai</th>
                                     <th class="py-3 px-6 text-left">Total Jam</th>
                                     <th class="py-3 px-6 text-left">Status</th>
                                     <th class="py-3 px-6 text-center">Aksi</th>
@@ -55,8 +59,20 @@
                             <tbody class="text-gray-600 text-sm font-light">
                                 @forelse($absensi as $item)
                                 <tr class="border-b border-gray-200 hover:bg-gray-100">
-                                    <td class="py-3 px-6 text-left">
-                                        {{ $item->tanggal ? $item->tanggal->format('d/m/Y') : '-' }}
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">
+                                        @if($item->is_change_day)
+                                            @if($item->change_day_tanggal_awal && $item->change_day_tanggal_akhir)
+                                                @if($item->change_day_tanggal_awal->format('Y-m-d') == $item->change_day_tanggal_akhir->format('Y-m-d'))
+                                                    {{ $item->change_day_tanggal_awal->format('d/m/Y') }}
+                                                @else
+                                                    {{ $item->change_day_tanggal_awal->format('d/m/Y') }} - {{ $item->change_day_tanggal_akhir->format('d/m/Y') }}
+                                                @endif
+                                            @else
+                                                {{ $item->tanggal ? $item->tanggal->format('d/m/Y') : '-' }}
+                                            @endif
+                                        @else
+                                            {{ $item->tanggal ? $item->tanggal->format('d/m/Y') : '-' }}
+                                        @endif
                                     </td>
                                     <td class="py-3 px-6 text-left">
                                         {{ $item->karyawan->nama_lengkap ?? $item->nama_karyawan }}<br>
@@ -73,14 +89,14 @@
                                         @endif
                                     </td>
                                     <td class="py-3 px-6 text-left">
-                                        @if($item->is_change_day && $item->change_day_status == 'approved')
+                                        @if($item->is_change_day)
                                             {{ $item->change_day_jam_mulai ? substr($item->change_day_jam_mulai, 0, 5) : '-' }}
                                         @else
                                             {{ $item->jam_masuk ? \Carbon\Carbon::parse($item->jam_masuk)->format('H:i') : '-' }}
                                         @endif
                                     </td>
                                     <td class="py-3 px-6 text-left">
-                                        @if($item->is_change_day && $item->change_day_status == 'approved')
+                                        @if($item->is_change_day)
                                             {{ $item->change_day_jam_selesai ? substr($item->change_day_jam_selesai, 0, 5) : '-' }}
                                         @else
                                             {{ $item->jam_pulang ? \Carbon\Carbon::parse($item->jam_pulang)->format('H:i') : '-' }}
@@ -146,8 +162,14 @@
                     <form id="statusForm" method="POST">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="status_kehadiran" id="statusKehadiranInput">
-                        <input type="hidden" name="change_day_status" id="changeDayStatusInput">
+                        <div id="changeDayStatusSection" style="display: none;">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Status Change Day</label>
+                            <select name="change_day_status" id="changeDaySelect" class="shadow border rounded w-full py-2 px-3 mb-4">
+                                <option value="pending">Pending</option>
+                                <option value="approved">Disetujui</option>
+                                <option value="rejected">Ditolak</option>
+                            </select>
+                        </div>
                         <div id="catatanSection" style="display: none;">
                             <label class="block text-gray-700 text-sm font-bold mb-2">Catatan (Opsional)</label>
                             <textarea name="change_day_catatan_admin" id="catatanAdmin" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
@@ -168,10 +190,11 @@
 
     <script>
         let currentItem = null;
-        let isChangeDay = false;
         
         function updateStatus(id) {
-            document.getElementById(`form-${id}`).submit();
+            if (confirm('Yakin ingin mengubah status absensi ini?')) {
+                document.getElementById(`form-${id}`).submit();
+            }
         }
         
         function showDetail(id) {
@@ -179,25 +202,43 @@
                 .then(response => response.json())
                 .then(data => {
                     currentItem = data;
-                    isChangeDay = data.is_change_day;
                     
                     let content = `
                         <div class="space-y-2 mb-4">
                             <p><strong>Nama Karyawan:</strong> ${data.karyawan?.nama_lengkap || data.nama_karyawan}</p>
                             <p><strong>NIP:</strong> ${data.karyawan?.nip || '-'}</p>
-                            <p><strong>Tanggal:</strong> ${new Date(data.tanggal).toLocaleDateString('id-ID')}</p>
                     `;
                     
                     if (data.is_change_day) {
                         content += `
                             <p><strong>Tipe:</strong> Change Day</p>
-                            <p><strong>Tanggal Change Day:</strong> ${new Date(data.change_day_tanggal_awal).toLocaleDateString('id-ID')} - ${new Date(data.change_day_tanggal_akhir).toLocaleDateString('id-ID')}</p>
-                            <p><strong>Jam Change Day:</strong> ${data.change_day_jam_mulai?.substring(0,5)} - ${data.change_day_jam_selesai?.substring(0,5)}</p>
+                            <p><strong>Tanggal Change Day:</strong> ${data.change_day_tanggal_awal ? new Date(data.change_day_tanggal_awal).toLocaleDateString('id-ID') : '-'} - ${data.change_day_tanggal_akhir ? new Date(data.change_day_tanggal_akhir).toLocaleDateString('id-ID') : '-'}</p>
+                            <p><strong>Jam Change Day:</strong> ${data.change_day_jam_mulai?.substring(0,5) || '-'} - ${data.change_day_jam_selesai?.substring(0,5) || '-'}</p>
                             <p><strong>Alasan Change Day:</strong> ${data.change_day_alasan || '-'}</p>
                             <p><strong>Status Change Day:</strong> ${data.change_day_status}</p>
                         `;
+                        
+                        if (data.change_day_catatan_admin) {
+                            content += `<p><strong>Catatan Admin:</strong> ${data.change_day_catatan_admin}</p>`;
+                        }
+                        
+                        if (data.change_day_disetujui_pada) {
+                            content += `<p><strong>Disetujui Pada:</strong> ${new Date(data.change_day_disetujui_pada).toLocaleString('id-ID')}</p>`;
+                        }
+                        
+                        if (data.disetujui_oleh) {
+                            content += `<p><strong>Disetujui Oleh:</strong> ${data.disetujui_oleh.nama_lengkap || '-'}</p>`;
+                        }
+                        
+                        // Tampilkan form update status change day
+                        document.getElementById('changeDayStatusSection').style.display = 'block';
+                        document.getElementById('catatanSection').style.display = 'block';
+                        document.getElementById('changeDaySelect').value = data.change_day_status || 'pending';
+                        document.getElementById('catatanAdmin').value = data.change_day_catatan_admin || '';
+                        
                     } else {
                         content += `
+                            <p><strong>Tanggal:</strong> ${new Date(data.tanggal).toLocaleDateString('id-ID')}</p>
                             <p><strong>Jam Masuk:</strong> ${data.jam_masuk ? data.jam_masuk.substring(0,5) : '-'}</p>
                             <p><strong>Lokasi Masuk:</strong> ${data.lokasi_masuk || '-'}</p>
                             <p><strong>Jam Pulang:</strong> ${data.jam_pulang ? data.jam_pulang.substring(0,5) : '-'}</p>
@@ -205,68 +246,39 @@
                             <p><strong>Total Jam Kerja:</strong> ${data.total_jam_kerja ? data.total_jam_kerja + ' jam' : '-'}</p>
                             <p><strong>Status Kehadiran:</strong> ${data.status_kehadiran}</p>
                         `;
+                        
+                        document.getElementById('changeDayStatusSection').style.display = 'none';
+                        document.getElementById('catatanSection').style.display = 'none';
                     }
                     
                     content += `<p><strong>Keterangan:</strong> ${data.keterangan || '-'}</p>`;
-                    
-                    if (data.change_day_catatan_admin) {
-                        content += `<p><strong>Catatan Admin:</strong> ${data.change_day_catatan_admin}</p>`;
-                    }
-                    
                     content += `</div>`;
                     
                     document.getElementById('detailContent').innerHTML = content;
                     
-                    // Setup form for status update
+                    // Setup form action
                     const statusForm = document.getElementById('statusForm');
-                    const catatanSection = document.getElementById('catatanSection');
-                    const statusKehadiranInput = document.getElementById('statusKehadiranInput');
-                    const changeDayStatusInput = document.getElementById('changeDayStatusInput');
-                    
-                    if (data.is_change_day) {
-                        catatanSection.style.display = 'block';
-                        statusKehadiranInput.disabled = true;
-                        changeDayStatusInput.disabled = false;
-                        
-                        // Create select for change day status
-                        const selectHtml = `
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Status Change Day</label>
-                                <select name="change_day_status" id="changeDaySelect" class="shadow border rounded w-full py-2 px-3" required>
-                                    <option value="pending" ${data.change_day_status == 'pending' ? 'selected' : ''}>Pending</option>
-                                    <option value="approved" ${data.change_day_status == 'approved' ? 'selected' : ''}>Disetujui</option>
-                                    <option value="rejected" ${data.change_day_status == 'rejected' ? 'selected' : ''}>Ditolak</option>
-                                </select>
-                            </div>
-                        `;
-                        document.getElementById('catatanSection').insertAdjacentHTML('beforebegin', selectHtml);
-                        
-                        statusForm.action = `/admin/absensi/${data.id}/status`;
-                    } else {
-                        catatanSection.style.display = 'none';
-                        statusKehadiranInput.disabled = false;
-                        changeDayStatusInput.disabled = true;
-                        statusForm.action = `/admin/absensi/${data.id}/status`;
-                    }
+                    statusForm.action = `/admin/absensi/${data.id}/status`;
                     
                     document.getElementById('detailModal').classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Gagal memuat detail data');
                 });
         }
         
         function closeDetailModal() {
             document.getElementById('detailModal').classList.add('hidden');
-            const selectElement = document.getElementById('changeDaySelect');
-            if (selectElement) {
-                selectElement.remove();
-            }
             currentItem = null;
         }
         
-        document.getElementById('statusForm').addEventListener('submit', function(e) {
-            const changeDaySelect = document.getElementById('changeDaySelect');
-            if (changeDaySelect) {
-                document.getElementById('changeDayStatusInput').value = changeDaySelect.value;
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target == modal) {
+                closeDetailModal();
             }
-        });
+        }
     </script>
 </x-app-layout>

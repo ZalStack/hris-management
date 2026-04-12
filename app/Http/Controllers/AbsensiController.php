@@ -12,8 +12,6 @@ use Carbon\Carbon;
 
 class AbsensiController extends Controller
 {
-    // ==================== EMPLOYEE SECTION ====================
-    
     public function index()
     {
         $absensi = AbsensiKaryawan::where('karyawan_id', Auth::id())
@@ -34,10 +32,20 @@ class AbsensiController extends Controller
         return view('absensi.index', compact('absensi', 'absensiToday', 'pendingChangeDays'));
     }
 
+    public function show($id)
+    {
+        $absensi = AbsensiKaryawan::with(['karyawan', 'disetujuiOleh'])
+            ->where('karyawan_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return response()->json($absensi);
+    }
+    
     public function create()
     {
         $today = Carbon::today();
-        
+
         // Cek apakah sudah absen hari ini
         $absensiToday = AbsensiKaryawan::where('karyawan_id', Auth::id())
             ->whereDate('tanggal', $today)
@@ -74,11 +82,11 @@ class AbsensiController extends Controller
             if ($request->jenis_absensi === 'change_day') {
                 // Handle change day request
                 $tanggalAwal = Carbon::parse($request->change_day_tanggal_awal);
-                
+
                 // Cek apakah sudah ada pengajuan change day untuk tanggal tersebut
                 $existingChangeDay = AbsensiKaryawan::where('karyawan_id', $karyawan->id)
                     ->where('is_change_day', true)
-                    ->where(function($query) use ($request) {
+                    ->where(function ($query) use ($request) {
                         $query->whereBetween('change_day_tanggal_awal', [$request->change_day_tanggal_awal, $request->change_day_tanggal_akhir])
                             ->orWhereBetween('change_day_tanggal_akhir', [$request->change_day_tanggal_awal, $request->change_day_tanggal_akhir]);
                     })
@@ -122,7 +130,6 @@ class AbsensiController extends Controller
                 DB::commit();
                 return redirect()->route('absensi.index')
                     ->with('success', 'Pengajuan change day berhasil dikirim, menunggu persetujuan HR/Admin');
-
             } elseif ($request->jenis_absensi === 'masuk') {
                 // Cek apakah sudah absen hari ini
                 $existingAbsensi = AbsensiKaryawan::where('karyawan_id', $karyawan->id)
@@ -149,7 +156,7 @@ class AbsensiController extends Controller
                 ];
 
                 AbsensiKaryawan::create($data);
-                
+
                 DB::commit();
                 return redirect()->route('absensi.index')
                     ->with('success', 'Absensi masuk berhasil ditambahkan, menunggu persetujuan HR/Admin');
@@ -307,7 +314,7 @@ class AbsensiController extends Controller
         try {
             $tanggalAbsensi = $absensi->tanggal->format('Y-m-d');
             $jamMasukValue = $absensi->jam_masuk;
-            
+
             if (strpos($jamMasukValue, ' ') !== false) {
                 $jamMasukValue = substr($jamMasukValue, 11, 5);
             }
@@ -399,16 +406,16 @@ class AbsensiController extends Controller
                     $updateData['change_day_disetujui_pada'] = now();
                     $updateData['change_day_disetujui_oleh'] = Auth::id();
                     $updateData['status_kehadiran'] = AbsensiKaryawan::STATUS_HADIR;
-                    
+
+                    // Set jam masuk dan pulang dari change day
+                    $updateData['jam_masuk'] = $absensi->change_day_jam_mulai;
+                    $updateData['jam_pulang'] = $absensi->change_day_jam_selesai;
+
                     // Hitung total jam kerja
                     $totalJam = $absensi->hitungTotalJamChangeDay();
                     if ($totalJam > 0) {
                         $updateData['total_jam_kerja'] = $totalJam;
                     }
-                    
-                    // Set jam masuk dan pulang dari change day
-                    $updateData['jam_masuk'] = $absensi->change_day_jam_mulai;
-                    $updateData['jam_pulang'] = $absensi->change_day_jam_selesai;
                 } elseif ($request->change_day_status === AbsensiKaryawan::CHANGE_DAY_REJECTED) {
                     $updateData['status_kehadiran'] = AbsensiKaryawan::STATUS_ALPHA;
                 }
@@ -416,10 +423,10 @@ class AbsensiController extends Controller
                 $absensi->update($updateData);
 
                 $statusText = $request->change_day_status === 'approved' ? 'disetujui' : 'ditolak';
-                $message = "Pengajuan change day Anda pada tanggal " . 
-                    ($absensi->change_day_tanggal_awal ? $absensi->change_day_tanggal_awal->format('d/m/Y') : '-') . 
+                $message = "Pengajuan change day Anda pada tanggal " .
+                    ($absensi->change_day_tanggal_awal ? $absensi->change_day_tanggal_awal->format('d/m/Y') : '-') .
                     " telah {$statusText}";
-                
+
                 if ($request->change_day_catatan_admin) {
                     $message .= " dengan catatan: {$request->change_day_catatan_admin}";
                 }
@@ -434,7 +441,6 @@ class AbsensiController extends Controller
                 DB::commit();
                 return redirect()->route('admin.absensi.index')
                     ->with('success', 'Status change day berhasil diupdate');
-
             } else {
                 // Handle regular attendance status update
                 $request->validate([

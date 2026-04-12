@@ -37,11 +37,11 @@ class AbsensiKaryawan extends Model
 
     protected $casts = [
         'tanggal' => 'date',
-        'total_jam_kerja' => 'decimal:2',
-        'is_change_day' => 'boolean',
         'change_day_tanggal_awal' => 'date',
         'change_day_tanggal_akhir' => 'date',
         'change_day_disetujui_pada' => 'datetime',
+        'total_jam_kerja' => 'decimal:2',
+        'is_change_day' => 'boolean',
     ];
 
     // Status constants
@@ -61,7 +61,7 @@ class AbsensiKaryawan extends Model
             self::CHANGE_DAY_PENDING => '<span class="bg-yellow-200 text-yellow-800 py-1 px-3 rounded-full text-xs">Pending</span>',
             self::CHANGE_DAY_APPROVED => '<span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs">Disetujui</span>',
             self::CHANGE_DAY_REJECTED => '<span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Ditolak</span>',
-            default => '<span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">' . ucfirst($this->change_day_status) . '</span>',
+            default => '<span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">' . ucfirst($this->change_day_status ?? '') . '</span>',
         };
     }
 
@@ -97,9 +97,22 @@ class AbsensiKaryawan extends Model
         }
 
         try {
-            $tanggalMulai = $this->change_day_tanggal_awal->format('Y-m-d');
-            $jamMulai = Carbon::parse($tanggalMulai . ' ' . $this->change_day_jam_mulai);
-            $jamSelesai = Carbon::parse($tanggalMulai . ' ' . $this->change_day_jam_selesai);
+            $tanggalMulai = $this->change_day_tanggal_awal ? $this->change_day_tanggal_awal->format('Y-m-d') : date('Y-m-d');
+            
+            // Parse jam mulai
+            $jamMulaiStr = $this->change_day_jam_mulai;
+            if (strpos($jamMulaiStr, ' ') !== false) {
+                $jamMulaiStr = substr($jamMulaiStr, 11, 5);
+            }
+            
+            // Parse jam selesai
+            $jamSelesaiStr = $this->change_day_jam_selesai;
+            if (strpos($jamSelesaiStr, ' ') !== false) {
+                $jamSelesaiStr = substr($jamSelesaiStr, 11, 5);
+            }
+            
+            $jamMulai = Carbon::parse($tanggalMulai . ' ' . $jamMulaiStr);
+            $jamSelesai = Carbon::parse($tanggalMulai . ' ' . $jamSelesaiStr);
 
             if ($jamSelesai < $jamMulai) {
                 $jamSelesai->addDay();
