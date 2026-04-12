@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            @if($absensiToday && !$absensiToday->jam_pulang && !$absensiToday->is_change_day)
+            @if($absensiToday && !$absensiToday->jam_pulang)
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
                 <p class="font-bold">Perhatian!</p>
                 <p>Anda sudah melakukan absensi masuk hari ini. Jangan lupa untuk melakukan absensi pulang.</p>
@@ -41,7 +41,7 @@
             </div>
             @elseif(!$absensiToday)
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
-                <p>Anda belum melakukan absensi hari ini. Silakan lakukan absensi sekarang atau ajukan Change Day.</p>
+                <p>Anda belum melakukan absensi hari ini. Silakan lakukan absensi sekarang.</p>
                 <div class="mt-2 space-x-2">
                     <a href="{{ route('absensi.create') }}?type=masuk" class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                         Absensi Masuk
@@ -78,9 +78,6 @@
                                         {{ $item->tanggal->format('d/m/Y') }}
                                         @if($item->is_change_day)
                                             <span class="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">Change Day</span>
-                                            @if($item->change_day_tanggal_awal && $item->change_day_tanggal_akhir && $item->change_day_tanggal_awal != $item->change_day_tanggal_akhir)
-                                                <br><small class="text-gray-500">({{ $item->change_day_tanggal_awal->format('d/m/Y') }} - {{ $item->change_day_tanggal_akhir->format('d/m/Y') }})</small>
-                                            @endif
                                         @endif
                                     </td>
                                     <td class="py-3 px-6 text-left">
@@ -100,7 +97,17 @@
                                     <td class="py-3 px-6 text-left">{{ $item->total_jam_kerja ? number_format($item->total_jam_kerja, 2) . ' jam' : '-' }}</td>
                                     <td class="py-3 px-6 text-left">
                                         @if($item->is_change_day)
-                                            {!! $item->change_day_status_badge !!}
+                                            @php
+                                                $statusColors = [
+                                                    'pending' => 'yellow',
+                                                    'approved' => 'green',
+                                                    'rejected' => 'red'
+                                                ];
+                                                $color = $statusColors[$item->change_day_status] ?? 'gray';
+                                            @endphp
+                                            <span class="bg-{{ $color }}-200 text-{{ $color }}-800 py-1 px-3 rounded-full text-xs">
+                                                {{ strtoupper($item->change_day_status) }}
+                                            </span>
                                         @else
                                             @php
                                                 $statusColors = [
@@ -144,7 +151,7 @@
                                                     </button>
                                                 </form>
                                             </div>
-                                        @elseif(!$item->is_change_day && $item->status_kehadiran == 'pending')
+                                        @elseif(!$item->is_change_day && $item->status_kehadiran == 'pending' && !$item->jam_pulang)
                                             <a href="{{ route('absensi.edit', $item->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded text-xs">
                                                 Edit
                                             </a>
@@ -216,7 +223,7 @@
 
     <script>
         function openPulangModal(id) {
-            document.getElementById('pulangForm').action = `/absensi/${id}/pulang`;
+            document.getElementById('pulangForm').action = '/absensi/' + id + '/pulang';
             document.getElementById('pulangModal').classList.remove('hidden');
         }
         
