@@ -33,10 +33,6 @@
                     <div class="text-red-600 text-sm">Alpha</div>
                     <div class="text-2xl font-bold text-red-600">{{ $statistics['alpha'] }}</div>
                 </div>
-                <div class="bg-indigo-50 rounded-lg shadow p-4">
-                    <div class="text-indigo-600 text-sm">Change Day Pending</div>
-                    <div class="text-2xl font-bold text-indigo-600">{{ $statistics['change_day_pending'] }}</div>
-                </div>
             </div>
 
             <!-- Data Table -->
