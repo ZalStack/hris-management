@@ -27,13 +27,13 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: laravel_db
+    container_name: hris-management
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: root
-      MYSQL_USER: laravel
+      MYSQL_DATABASE: hris-management
+      MYSQL_ROOT_PASSWORD: p@ssw0rd123
+      MYSQL_PASSWORD: p@ssw0rd123
+      MYSQL_USER: root
     ports:
       - "3306:3306"
     volumes:

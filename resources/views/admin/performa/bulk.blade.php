@@ -9,6 +9,15 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
+                    <div class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4">
+                        <p class="text-blue-700 text-sm">
+                            <strong>Informasi Perhitungan Otomatis:</strong><br>
+                            - KPI Score = Rata-rata dari (Productivity + Discipline + Quality + Teamwork)<br>
+                            - Attendance Rate = Sama dengan KPI Score<br>
+                            - Performance Score = Perhitungan berbobot dari semua komponen
+                        </p>
+                    </div>
+
                     <form method="POST" action="{{ route('admin.performa.bulk.store') }}" id="bulkForm">
                         @csrf
 
@@ -69,16 +78,24 @@
                                 </thead>
                                 <tbody class="text-gray-600 text-sm font-light">
                                     @foreach ($karyawans as $index => $karyawan)
+                                        @php
+                                            // Get existing performance data for this employee
+                                            $existingPerforma = \App\Models\Performa::where('karyawan_id', $karyawan->id)
+                                                ->where('bulan', $currentMonth)
+                                                ->where('tahun', $currentYear)
+                                                ->first();
+                                        @endphp
                                         <tr class="border-b border-gray-200">
                                             <td class="py-3 px-4">
                                                 {{ $karyawan->nama_lengkap }}<br>
                                                 <small class="text-gray-500">{{ $karyawan->nip }}</small>
                                                 <input type="hidden" name="performas[{{ $index }}][karyawan_id]"
                                                     value="{{ $karyawan->id }}">
+                                            </td>
                                             <td class="py-3 px-4">
                                                 <input type="number" name="performas[{{ $index }}][quality]"
                                                     class="quality shadow border rounded w-20 py-1 px-2 text-center"
-                                                    min="0" max="100" value="0"
+                                                    min="0" max="100" value="{{ $existingPerforma->quality ?? 0 }}"
                                                     onchange="calculateRowTotal(this)"
                                                     onkeyup="calculateRowTotal(this)">
                                             </td>
@@ -86,36 +103,37 @@
                                                 <input type="number"
                                                     name="performas[{{ $index }}][productivity]"
                                                     class="productivity shadow border rounded w-20 py-1 px-2 text-center"
-                                                    min="0" max="100" value="0"
+                                                    min="0" max="100" value="{{ $existingPerforma->productivity ?? 0 }}"
                                                     onchange="calculateRowTotal(this)"
                                                     onkeyup="calculateRowTotal(this)">
                                             </td>
                                             <td class="py-3 px-4">
                                                 <input type="number" name="performas[{{ $index }}][teamwork]"
                                                     class="teamwork shadow border rounded w-20 py-1 px-2 text-center"
-                                                    min="0" max="100" value="0"
+                                                    min="0" max="100" value="{{ $existingPerforma->teamwork ?? 0 }}"
                                                     onchange="calculateRowTotal(this)"
                                                     onkeyup="calculateRowTotal(this)">
                                             </td>
                                             <td class="py-3 px-4">
                                                 <input type="number" name="performas[{{ $index }}][discipline]"
                                                     class="discipline shadow border rounded w-20 py-1 px-2 text-center"
-                                                    min="0" max="100" value="0"
+                                                    min="0" max="100" value="{{ $existingPerforma->discipline ?? 0 }}"
                                                     onchange="calculateRowTotal(this)"
                                                     onkeyup="calculateRowTotal(this)">
                                             </td>
                                             <td class="py-3 px-6 text-left">
-                                                <span
-                                                    class="font-semibold text-green-600">{{ $item->attendance_rate }}%</span>
+                                                <span class="attendance-display font-semibold text-green-600">{{ $existingPerforma->attendance_rate ?? 0 }}%</span>
+                                                <input type="hidden" class="attendance-input" name="performas[{{ $index }}][attendance_rate]" value="{{ $existingPerforma->attendance_rate ?? 0 }}">
                                             </td>
                                             <td class="py-3 px-6 text-left font-bold text-blue-600">
-                                                {{ $item->kpi_score }}%
+                                                <span class="kpi-display">{{ $existingPerforma->kpi_score ?? 0 }}</span>%
+                                                <input type="hidden" class="kpi-input" name="performas[{{ $index }}][kpi_score]" value="{{ $existingPerforma->kpi_score ?? 0 }}">
                                             </td>
                                             <td class="py-3 px-4">
-                                                <span class="total-display font-bold text-purple-600">0</span>
+                                                <span class="total-display font-bold text-purple-600">{{ $existingPerforma->performance_score ?? 0 }}</span>
                                                 <input type="hidden"
                                                     name="performas[{{ $index }}][performance_score]"
-                                                    class="total-input" value="0">
+                                                    class="total-input" value="{{ $existingPerforma->performance_score ?? 0 }}">
                                             </td>
                                         </tr>
                                     @endforeach
@@ -164,14 +182,20 @@
             );
 
             // Update displays
-            row.querySelector('.kpi-display').innerText = kpiScore;
-            row.querySelector('.kpi-input').value = kpiScore;
+            const kpiDisplay = row.querySelector('.kpi-display');
+            const kpiInput = row.querySelector('.kpi-input');
+            if (kpiDisplay) kpiDisplay.innerText = kpiScore;
+            if (kpiInput) kpiInput.value = kpiScore;
 
-            row.querySelector('.attendance-display').innerText = attendanceRate;
-            row.querySelector('.attendance-input').value = attendanceRate;
+            const attendanceDisplay = row.querySelector('.attendance-display');
+            const attendanceInput = row.querySelector('.attendance-input');
+            if (attendanceDisplay) attendanceDisplay.innerText = attendanceRate;
+            if (attendanceInput) attendanceInput.value = attendanceRate;
 
-            row.querySelector('.total-display').innerText = total;
-            row.querySelector('.total-input').value = total;
+            const totalDisplay = row.querySelector('.total-display');
+            const totalInput = row.querySelector('.total-input');
+            if (totalDisplay) totalDisplay.innerText = total;
+            if (totalInput) totalInput.value = total;
         }
 
         // Add event listeners to all inputs
