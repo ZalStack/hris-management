@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Karyawan;
-use App\Models\Departemen;
-use App\Models\Jabatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,20 +12,17 @@ class DashboardController extends Controller
     public function index()
     {
         $totalKaryawan = Karyawan::count();
-        $totalDepartemen = Departemen::count();
-        $totalJabatan = Jabatan::count();
         $karyawanAktif = Karyawan::where('status', 'aktif')->count();
+        $karyawanPending = Karyawan::where('status', 'pending')->count();
+        $adminHrCount = Karyawan::whereIn('role', ['admin', 'hr'])->count();
         
-        return view('admin.dashboard', compact('totalKaryawan', 'totalDepartemen', 'totalJabatan', 'karyawanAktif'));
+        return view('admin.dashboard', compact('totalKaryawan', 'karyawanAktif', 'karyawanPending', 'adminHrCount'));
     }
 
     public function karyawan()
     {
         $karyawans = Karyawan::orderBy('created_at', 'desc')->paginate(10);
-        $departemens = Departemen::all();
-        $jabatans = Jabatan::with('departemen')->get();
-        
-        return view('admin.karyawan.index', compact('karyawans', 'departemens', 'jabatans'));
+        return view('admin.karyawan.index', compact('karyawans'));
     }
 
     public function storeKaryawan(Request $request)

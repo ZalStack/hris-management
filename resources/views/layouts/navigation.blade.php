@@ -32,12 +32,6 @@
                             <x-nav-link :href="route('admin.karyawan')" :active="request()->routeIs('admin.karyawan')" class="text-gray-700 hover:text-blue-600 transition">
                                 Karyawan
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.departemen.index')" :active="request()->routeIs('admin.departemen.*')" class="text-gray-700 hover:text-blue-600 transition">
-                                Departemen
-                            </x-nav-link>
-                            <x-nav-link :href="route('admin.jabatan.index')" :active="request()->routeIs('admin.jabatan.*')" class="text-gray-700 hover:text-blue-600 transition">
-                                Jabatan
-                            </x-nav-link>
                             <x-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')" class="text-gray-700 hover:text-blue-600 transition">
                                 Absensi
                             </x-nav-link>
@@ -209,12 +203,6 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.karyawan')" :active="request()->routeIs('admin.karyawan')" class="py-2">
                         Data Karyawan
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.departemen.index')" :active="request()->routeIs('admin.departemen.*')" class="py-2">
-                        Departemen
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.jabatan.index')" :active="request()->routeIs('admin.jabatan.*')" class="py-2">
-                        Jabatan
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.absensi.index')" :active="request()->routeIs('admin.absensi.*')" class="py-2">
                         Absensi

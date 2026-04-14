@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\DepartmentController;
-use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\CutiController;
 use App\Http\Controllers\PengumumanController;
@@ -119,13 +117,6 @@ Route::middleware(['auth', 'admin'])
         Route::put('/karyawan/{id}', [AdminDashboardController::class, 'updateKaryawan'])->name('karyawan.update');
         Route::delete('/karyawan/{id}', [AdminDashboardController::class, 'destroyKaryawan'])->name('karyawan.destroy');
         Route::get('/karyawan/{id}/show-password', [AdminDashboardController::class, 'showPassword'])->name('karyawan.show-password');
-
-        // Department Management
-        Route::resource('departemen', DepartmentController::class);
-
-        // Position Management
-        Route::resource('jabatan', PositionController::class);
-        Route::get('/jabatan-by-departemen/{departemen_id}', [PositionController::class, 'getByDepartemen'])->name('jabatan.by-departemen');
 
         // Absensi Management for Admin/HR
         Route::prefix('absensi')

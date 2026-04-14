@@ -25,8 +25,7 @@ class PengumumanController extends Controller
     public function create()
     {
         $karyawans = Karyawan::all();
-        $departemens = \App\Models\Departemen::all();
-        return view('admin.pengumuman.create', compact('karyawans', 'departemens'));
+        return view('admin.pengumuman.create', compact('karyawans'));
     }
     
     public function store(Request $request)
@@ -36,7 +35,6 @@ class PengumumanController extends Controller
             'konten' => 'required',
             'kategori' => 'nullable|max:50',
             'target_role' => 'nullable|in:all,admin,hr,karyawan',
-            'target_departemen' => 'nullable',
             'tanggal_terbit' => 'nullable|date',
             'tanggal_berlaku_hingga' => 'nullable|date|after_or_equal:tanggal_terbit',
             'lampiran' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
@@ -70,8 +68,7 @@ class PengumumanController extends Controller
     {
         $pengumuman = Pengumuman::findOrFail($id);
         $karyawans = Karyawan::all();
-        $departemens = \App\Models\Departemen::all();
-        return view('admin.pengumuman.edit', compact('pengumuman', 'karyawans', 'departemens'));
+        return view('admin.pengumuman.edit', compact('pengumuman', 'karyawans'));
     }
     
     public function update(Request $request, $id)
@@ -83,7 +80,6 @@ class PengumumanController extends Controller
             'konten' => 'required',
             'kategori' => 'nullable|max:50',
             'target_role' => 'nullable|in:all,admin,hr,karyawan',
-            'target_departemen' => 'nullable',
             'tanggal_terbit' => 'nullable|date',
             'tanggal_berlaku_hingga' => 'nullable|date|after_or_equal:tanggal_terbit',
             'lampiran' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
@@ -140,7 +136,7 @@ class PengumumanController extends Controller
             Notifikasi::create([
                 'user_id' => $user->id,
                 'judul' => $pengumuman->judul,
-                'pesan' => substr(strip_tags($pengumuman->konten), 0, 200) . (strlen(strip_tags($pengumuman->konten)) > 200 ? '...' : ''),
+                'pesan' => substr($pengumuman->konten, 0, 200) . (strlen($pengumuman->konten) > 200 ? '...' : ''),
                 'tipe_notifikasi' => 'pengumuman',
                 'status' => false,
             ]);

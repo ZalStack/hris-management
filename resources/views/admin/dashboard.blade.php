@@ -55,10 +55,6 @@
                                     </path>
                                 </svg>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-700">Total Departemen</h3>
-                                <p class="text-3xl font-bold text-gray-900">{{ $totalDepartemen }}</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -74,16 +70,9 @@
                                     </path>
                                 </svg>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-700">Total Jabatan</h3>
-                                <p class="text-3xl font-bold text-gray-900">{{ $totalJabatan }}</p>
-                            </div>
                         </div>
                     </div>
                 </div>
-
-
-
 
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
@@ -96,10 +85,6 @@
                                     </path>
                                 </svg>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-700">Total Departemen</h3>
-                                <p class="text-3xl font-bold text-gray-900">{{ $totalDepartemen }}</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,20 +100,8 @@
                                     </path>
                                 </svg>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-700">Total Jabatan</h3>
-                                <p class="text-3xl font-bold text-gray-900">{{ $totalJabatan }}</p>
-                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Selamat Datang di HRIS Management</h3>
-                    <p class="text-gray-600">Sistem Informasi Sumber Daya Manusia untuk mengelola data karyawan,
-                        departemen, dan jabatan dengan mudah dan efisien.</p>
                 </div>
             </div>
         </div>
